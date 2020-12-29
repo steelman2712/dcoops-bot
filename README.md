@@ -1,0 +1,2 @@
+# dcoops-bot
+Discord bot
