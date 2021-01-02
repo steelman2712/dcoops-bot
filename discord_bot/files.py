@@ -35,6 +35,7 @@ class Files(BaseFile, commands.Cog):
 
     @commands.command()
     async def upload(self, ctx, alias):
+        print(f"Uploading new file with alias {alias}")
         url = ctx.message.attachments[0].url
         server = ctx.guild.id 
         db_file = create_file(alias,url,server)
@@ -44,6 +45,7 @@ class Files(BaseFile, commands.Cog):
     async def load(self, ctx, alias):
         try:
             db_file = await super().load(ctx, alias=alias, class_type=File)
+            print(f"Sending file with alias {alias}")
             await ctx.send(db_file.file_url)
         except NoResultFound:
             pass

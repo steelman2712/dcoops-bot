@@ -1,0 +1,37 @@
+version: '3.6'
+
+services: 
+  python:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - '80:80'
+    volumes:
+      - type: bind
+        source: .
+        target: /discord
+    command: tail -f /dev/null
+    links:
+      - 'mysql'
+
+  mysql:
+    image: mysql/mysql-server:latest
+    restart: always
+    ports:
+      - '3306:3306'
+    environment:
+      - MYSQL_ROOT_PASSWORD=root
+      - MYSQL_USER=${DB_USERNAME}
+      - MYSQL_PASSWORD=${DB_PASSWORD}
+      - MYSQL_DATABASE=discord
+      - MYSQL_ALLOW_EMPTY_PASSWORD=no
+    volumes:
+      - type: volume
+        source: discord-db
+        target: /var/lib/mysql
+
+
+volumes: 
+  discord-db:
+    external: true
