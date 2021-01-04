@@ -175,8 +175,10 @@ class Music(commands.Cog):
     async def yt_bind(self, ctx, url, start, stop, *, alias):
         async with ctx.typing():
             uncropped_file = await YTDLSource.yt_download(url)
+            print(uncropped_file)
             filename = os.path.splitext(uncropped_file)[0]
-            cropped_name = f"{filename}+_out.webm"
+            extension = os.path.splitext(uncropped_file)[1]
+            cropped_name = f"{filename}+_out.{extension}"
             cropped_file = await YTDLSource.crop(input=uncropped_file, output=cropped_name, start=start, stop=stop)
             my_file = discord.File(cropped_file) 
             message = await ctx.send(file=my_file)
@@ -186,11 +188,17 @@ class Music(commands.Cog):
             os.remove(cropped_file)
             await self.play(ctx=ctx,query=cdn_url)
 
+    @commands.command()
+    async def groans(self, ctx, alias="groans"):
+        await self.play(ctx=ctx,query=alias)
+        await ctx.invoke(self.bot.get_command('load'), alias=alias)
+
 
     @play.before_invoke
     @yt.before_invoke
     @stream.before_invoke
     @yt_bind.before_invoke
+    @groans.before_invoke
     async def ensure_voice(self, ctx):
         if ctx.voice_client is None:
             if ctx.author.voice:
