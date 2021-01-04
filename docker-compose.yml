@@ -5,13 +5,13 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+    restart: always
     ports:
-      - '80:80'
+      - '8000:8000'
     volumes:
       - type: bind
         source: .
         target: /discord
-    command: tail -f /dev/null
     links:
       - 'mysql'
 
