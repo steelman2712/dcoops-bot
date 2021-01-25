@@ -7,12 +7,15 @@ load_dotenv(dotenv_path)
 
 import sys
 sys.path.append(os.path.abspath(os.path.join('.', 'discord_bot')))
-
+sys.path.append(os.path.abspath(os.path.join('.', 'face-swap')))
 from music import Music
 from files import Files
+from utilities import Utilities
+from activity import Resident
+from face_swap import FaceSwap
 
 bot = commands.Bot(command_prefix=commands.when_mentioned_or("!"),
-                   description='Relatively simple music bot example')
+                   description='DCoops bot')
 
 
 @bot.event
@@ -25,5 +28,7 @@ async def on_ready():
 token = os.environ.get("DISCORD_TOKEN")
 bot.add_cog(Music(bot))
 bot.add_cog(Files(bot))
+bot.add_cog(Utilities(bot))
+bot.add_cog(Resident(bot))
+bot.add_cog(FaceSwap(bot))
 bot.run(token)
-
