@@ -3,7 +3,7 @@ dictionary = {}
 from models.models import File,Bind
 from models.db import session_scope
 
-audio_files = (".mp3",".wav",".ogg")
+audio_files = (".mp3",".wav",".ogg",".webm",".m4a")
 from sqlalchemy.orm.exc import NoResultFound
 
 def create_file(alias,url,server):
@@ -28,6 +28,12 @@ class BaseFile():
             session.close()
         
         return db_file
+    
+    async def delete(self, ctx, alias, class_type):
+        server = ctx.guild.id
+        with session_scope() as session:
+            query = session.query(class_type).filter_by(alias=alias).filter_by(server=server).delete()
+            session.close()
 
 class Files(BaseFile, commands.Cog):
     def __init__(self, bot):
@@ -35,11 +41,17 @@ class Files(BaseFile, commands.Cog):
 
     @commands.command()
     async def upload(self, ctx, alias):
-        print(f"Uploading new file with alias {alias}")
-        url = ctx.message.attachments[0].url
-        server = ctx.guild.id 
-        db_file = create_file(alias,url,server)
-        await super().upload(db_file)
+        try:
+            print(f"Uploading new file with alias {alias}")
+            url = ctx.message.attachments[0].url
+            server = ctx.guild.id 
+            db_file = create_file(alias,url,server)
+            await super().upload(db_file)
+            await ctx.send(f"Created {alias}")
+        except:
+            await ctx.send(f"Could not create {alias}")
+
+
 
     @commands.command()
     async def load(self, ctx, alias):
@@ -51,7 +63,14 @@ class Files(BaseFile, commands.Cog):
             pass
         except:
             raise
-        
+    
+    @commands.command()
+    async def delete_file(self, ctx, alias):
+        try:
+            await super().delete(ctx, alias=alias, class_type=File)
+            await ctx.send(f"Deleted {alias}")
+        except:
+            await ctx.send(f"Could not delete {alias}")
         
 
 class Binds(BaseFile):
@@ -64,5 +83,12 @@ class Binds(BaseFile):
     async def load_bind(self, ctx, alias):
         db_file = await super().load(ctx, alias, Bind)
     
+    @commands.command()
+    async def delete_bind(self, ctx, alias):
+        try:
+            await super().delete(ctx, alias=alias, class_type=Bind)
+            await ctx.send(f"Deleted {alias}")
+        except:
+            await ctx.send(f"Could not delete {alias}")
 
     
