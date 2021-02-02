@@ -15,7 +15,7 @@ from activity import Resident
 from face_swap import FaceSwap
 
 bot = commands.Bot(command_prefix=commands.when_mentioned_or("!"),
-                   description='DCoops bot')
+                   description='DCoops bot', case_insensitive=True)
 
 
 @bot.event

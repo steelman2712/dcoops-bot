@@ -9,13 +9,16 @@ from discord.ext import commands
 from models.models import File, Bind
 from models.db import session_scope
 
-from files import Binds
+from files import Binds, Files
+import imgur
 
+import time
 import shlex
 import subprocess
+import moviepy.editor as mpy
+import ffmpeg
 # Suppress noise about console usage from errors
 youtube_dl.utils.bug_reports_message = lambda: ''
-
 
 ytdl_format_options = {
     'format': 'bestaudio/best',
@@ -35,8 +38,11 @@ ffmpeg_options = {
     'options': '-vn'
 }
 
-ytdl = youtube_dl.YoutubeDL(ytdl_format_options)
+ytdl_video_options = ytdl_format_options
+ytdl_video_options["format"]="bestvideo[height<=480,ext=mp4]+bestaudio[ext=m4a]/best[height<=480,ext=mp4]/best[ext=mp4]/best"
 
+ytdl = youtube_dl.YoutubeDL(ytdl_format_options)
+ytdl_video = youtube_dl.YoutubeDL(ytdl_video_options)
 
 class YTDLSource(discord.PCMVolumeTransformer):
     def __init__(self, source, *, data, volume=0.5):
@@ -49,7 +55,15 @@ class YTDLSource(discord.PCMVolumeTransformer):
 
     @classmethod
     async def crop(cls, input, output, start, stop):
-        ffmpeg_options = f"-vn -i {input} -ss {start} -to {stop} -c copy {output} -y"
+        ffmpeg_options = f"-vn -hide_banner -loglevel warning  -i {input} -ss {start} -to {stop} -c copy {output} -y"
+        args = ["ffmpeg"]
+        args.extend(shlex.split(ffmpeg_options))
+        subprocess.run(args)
+        return output
+
+    @classmethod
+    async def crop_video(cls, input, output, start, stop):
+        ffmpeg_options = f"-i {input} -ss {start} -to {stop} -c copy {output} -y"
         args = ["ffmpeg"]
         args.extend(shlex.split(ffmpeg_options))
         subprocess.run(args)
@@ -93,6 +107,36 @@ class YTDLSource(discord.PCMVolumeTransformer):
         filename = ytdl.prepare_filename(data)
         return filename
 
+    @classmethod
+    async def yt_video_download(cls,url, loop=None):
+        loop = loop or asyncio.get_event_loop()
+        data = await loop.run_in_executor(None, lambda: ytdl_video.extract_info(url, download=True))
+
+        if 'entries' in data:
+            # take first item from a playlist
+            data = data['entries'][0]
+
+        filename = ytdl.prepare_filename(data)
+        return filename
+        
+class Queue():
+    queue = []
+
+    def __repr__(self):
+        message = "Queue: \n"
+        index = 1
+        for song in self.queue:
+            message += f"{index}) {song}"
+        return message
+
+    async def add(self, song):
+        self.queue.append(song)
+    
+    async def remove(self,position):
+        del queue[i-1]
+
+    
+
 class Music(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
@@ -111,6 +155,7 @@ class Music(commands.Cog):
         """Plays a file from the local filesystem"""
         server = ctx.guild.id 
         with session_scope() as session:
+            query = query.lower()
             try:
                 db_query = session.query(Bind).filter_by(alias=query).filter_by(server=server)
                 bind = db_query.one()
@@ -162,17 +207,9 @@ class Music(commands.Cog):
         await ctx.voice_client.disconnect()
 
     @commands.command()
-    async def yt2(self, ctx, *, url):
-        """Streams from a url (same as yt, but doesn't predownload)"""
-
-        async with ctx.typing():
-            player = await YTDLSource.from_url_with_timestamp(url, loop=self.bot.loop, stream=True,start=10,stop=15)
-            ctx.voice_client.play(player, after=lambda e: print('Player error: %s' % e) if e else None)
-
-        await ctx.send('Now playing: {}'.format(player.title))
-
-    @commands.command()
     async def yt_bind(self, ctx, url, start, stop, *, alias):
+        """Creates a bind from a youtube video.
+        Format: !yt_bind video-url start stop bind-name"""
         async with ctx.typing():
             uncropped_file = await YTDLSource.yt_download(url)
             print(uncropped_file)
@@ -190,15 +227,47 @@ class Music(commands.Cog):
 
     @commands.command()
     async def groans(self, ctx, alias="groans"):
+        """Plays a bind and loads an image at the same time"""
         await self.play(ctx=ctx,query=alias)
         await ctx.invoke(self.bot.get_command('load'), alias=alias)
 
+    @commands.command()
+    async def yt_groans(self, ctx, url, start, stop, *, alias):
+        """Creates a bind and file from a youtube video.
+        Format: !yt_groan video-url start stop groan-name"""
+        async with ctx.typing():
+            uncropped_file = await YTDLSource.yt_video_download(url)
+            print(uncropped_file)           
+            #with mpy.VideoFileClip(uncropped_file) as clip:
+            #    clip = clip.subclip(start, stop)
+            #    clip.write_gif("bugsnax.gif")
+            #filesize = os.path.getsize("bugsnax.gif")
+            #print(filesize)
+            filename = os.path.splitext(uncropped_file)[0]
+            extension = os.path.splitext(uncropped_file)[1]
+            cropped_video_name = f"{filename}+_video{extension}"
+            cropped_audio_name = f"{filename}+_audio{extension}"
+            cropped_video = await YTDLSource.crop_video(input=uncropped_file, output=cropped_video_name, start=start, stop=stop)
+            cropped_audio = await YTDLSource.crop(input=uncropped_file, output=cropped_audio_name, start=start, stop=stop)
+            print(f"Uncropped video resolution: {ffmpeg.probe(cropped_video_name)}")
+            imgur_link = await imgur.upload_video(cropped_video)
+            my_file = discord.File(cropped_audio) 
+            message = await ctx.send(file=my_file)
+            cdn_url = message.attachments[0].url
+            bind = await Binds().upload_bind(ctx,cdn_url,alias)
+            message = await ctx.send(imgur_link)
+            await self.play(ctx=ctx,query=cdn_url)
+            await ctx.invoke(self.bot.get_command('upload_embed'), url=imgur_link,alias=alias)
+            os.remove(uncropped_file)
+            os.remove(cropped_video_name)
+            os.remove(cropped_audio_name)
 
     @play.before_invoke
     @yt.before_invoke
     @stream.before_invoke
     @yt_bind.before_invoke
     @groans.before_invoke
+    @yt_groans.before_invoke
     async def ensure_voice(self, ctx):
         if ctx.voice_client is None:
             if ctx.author.voice:
