@@ -38,6 +38,17 @@ class BaseFile():
             query = session.query(class_type).filter_by(alias=alias).filter_by(server=server).delete()
             session.commit()
             session.close()
+    
+    async def exists(self, ctx, alias, class_type):
+        alias = alias.lower()
+        server = ctx.guild.id
+        with session_scope() as session:
+            exists = session.query(class_type).filter_by(alias=alias).filter_by(server=server).scalar()
+            if exists != None:
+                return True
+            else:
+                return False
+
 
 class Files(BaseFile, commands.Cog):
     def __init__(self, bot):
@@ -94,6 +105,10 @@ class Files(BaseFile, commands.Cog):
         except:
             await ctx.send(f"Could not delete {alias}")
 
+    async def exists(self, ctx, alias):
+        exists = await super().exists(ctx, alias=alias, class_type=File)
+        return exists
+
 class Binds(BaseFile):
 
     async def upload_bind(self, ctx, url, alias):
@@ -104,6 +119,8 @@ class Binds(BaseFile):
     async def load_bind(self, ctx, alias):
         db_file = await super().load(ctx, alias, Bind)
     
-    
+    async def exists(self, ctx, alias):
+        exists = await super().exists(ctx, alias=alias, class_type=Bind)
+        return exists
 
     
