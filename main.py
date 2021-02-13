@@ -13,9 +13,13 @@ from files import Files
 from utilities import Utilities
 from activity import Resident
 from face_swap import FaceSwap
+from groans import Groans
+
+
+
 
 bot = commands.Bot(command_prefix=commands.when_mentioned_or("!"),
-                   description='DCoops bot')
+                   description='DCoops bot', case_insensitive=True)
 
 
 @bot.event
@@ -31,4 +35,5 @@ bot.add_cog(Files(bot))
 bot.add_cog(Utilities(bot))
 bot.add_cog(Resident(bot))
 bot.add_cog(FaceSwap(bot))
+bot.add_cog(Groans(bot))
 bot.run(token)
