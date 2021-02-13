@@ -58,7 +58,7 @@ class Utilities(commands.Cog):
             #except:
                 #await ctx.send("Could not retrieve the list of files")
 
-    @commands.command()
+    """ @commands.command()
     async def reload_binds(self,ctx):
         server = ctx.guild.id 
         reloaded_binds = []
@@ -87,5 +87,5 @@ class Utilities(commands.Cog):
                 
                 except Exception as e:
                     print(e)
-                    print("Couldn't do")
+                    print("Couldn't do") """
                 
