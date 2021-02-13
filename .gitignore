@@ -1,4 +1,7 @@
 face-swap/
+video-cache/
+
+*.mp4
 *.jpg
 *.gif
 # Byte-compiled / optimized / DLL files
