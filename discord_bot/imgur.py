@@ -47,7 +47,7 @@ async def upload_video(video_file):
     data = response.get("data")
     upload_id = data.get("id")
     link = data.get("link")
-    link = link.replace("https://i.imgur","https://imgur")
+    link = link.replace("https://i.imgur","http://imgur")
     print(link)
     await wait_until_processed(upload_id, client_id)
     return link

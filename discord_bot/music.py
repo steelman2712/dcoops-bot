@@ -62,7 +62,7 @@ class YTDLSource(discord.PCMVolumeTransformer):
 
     @classmethod
     async def crop(cls, input, output, start, stop):
-        ffmpeg_options = f"-vn -hide_banner -loglevel warning  -i {input} -ss {start} -to {stop} -c copy {output} -y"
+        ffmpeg_options = f"-vn -hide_banner -loglevel warning -ss {start} -to {stop} -i {input} -c copy -c:a libmp3lame {output} -y"
         args = ["ffmpeg"]
         args.extend(shlex.split(ffmpeg_options))
         subprocess.run(args)
@@ -70,7 +70,7 @@ class YTDLSource(discord.PCMVolumeTransformer):
 
     @classmethod
     async def crop_video(cls, input, output, start, stop):
-        ffmpeg_options = f"-i {input} -ss {start} -to {stop} -c copy {output} -y -loglevel warning -nostats"
+        ffmpeg_options = f"-ss {start} -to {stop} -i {input} -c copy -movflags faststart {output} -y -loglevel warning -nostats"
         args = ["ffmpeg"]
         args.extend(shlex.split(ffmpeg_options))
         subprocess.run(args)
@@ -232,7 +232,7 @@ class Music(commands.Cog):
             print(uncropped_file)
             filename = os.path.splitext(uncropped_file)[0]
             extension = os.path.splitext(uncropped_file)[1]
-            cropped_name = f"{filename}+_out.{extension}"
+            cropped_name = f"{filename}+_out.mp3"
             cropped_file = await YTDLSource.crop(input=uncropped_file, output=cropped_name, start=start, stop=stop)
             my_file = discord.File(cropped_file) 
             message = await ctx.send(file=my_file)

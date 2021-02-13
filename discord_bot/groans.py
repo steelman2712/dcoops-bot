@@ -33,7 +33,7 @@ class Groans(commands.Cog):
                 filename = os.path.splitext(uncropped_file)[0]
                 extension = os.path.splitext(uncropped_file)[1]
                 cropped_video_name = f"{filename}+_cropped_video{extension}"
-                cropped_audio_name = f"{filename}+_cropped_audio{extension}"
+                cropped_audio_name = f"{filename}+_cropped_audio.mp3"
                 cropped_video = await YTDLSource.crop_video(input=uncropped_file, output=cropped_video_name, start=start, stop=stop)
                 cropped_audio = await YTDLSource.crop(input=uncropped_file, output=cropped_audio_name, start=start, stop=stop)
                 print(cropped_video)
@@ -70,7 +70,7 @@ class Groans(commands.Cog):
             return False
     
     @commands.command()
-    async def delete_groan(self, ctx, alias):
+    async def delete_groans(self, ctx, alias):
         await ctx.invoke(self.bot.get_command('delete_file'), alias=alias)
         await ctx.invoke(self.bot.get_command('delete_bind'), alias=alias)
         await ctx.send(f"Deleted groan {alias}")
