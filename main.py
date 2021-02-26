@@ -14,6 +14,7 @@ from utilities import Utilities
 from activity import Resident
 from face_swap import FaceSwap
 from groans import Groans
+from jigsaw import Jigsaw
 
 
 
@@ -36,4 +37,5 @@ bot.add_cog(Utilities(bot))
 bot.add_cog(Resident(bot))
 bot.add_cog(FaceSwap(bot))
 bot.add_cog(Groans(bot))
+bot.add_cog(Jigsaw(bot))
 bot.run(token)
