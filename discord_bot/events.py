@@ -28,7 +28,7 @@ class Events(commands.Cog):
                 await tts_to_file(f"{name} has joined the voice channel")
                 await self.play_file(voice_client = voice_client)
             elif after.channel is None:
-                await tts_to_file(f"{name} has left the bloody bastard voice channel")
+                await tts_to_file(f"{name} has left the voice channel")
                 await self.play_file(voice_client = voice_client)
             else:
                 return
