@@ -5,18 +5,20 @@ from discord.ext import commands
 from models.models import File, Bind
 from models.db import session_scope
 
+
 def list_items(item_class, server):
     with session_scope() as session:
-            try:
-                db_query = session.query(item_class).filter_by(server=server)
-                files = db_query.all()
-                if len(files) == 0:
-                    output_text = "Nothing found"
-                else:
-                    output_text = '\n'.join((item.alias) for item in files)
-                return output_text
-            except:
-                raise
+        try:
+            db_query = session.query(item_class).filter_by(server=server)
+            files = db_query.all()
+            if len(files) == 0:
+                output_text = "Nothing found"
+            else:
+                output_text = "\n".join((item.alias) for item in files)
+            return output_text
+        except:
+            raise
+
 
 class Utilities(commands.Cog):
     def __init__(self, bot):
@@ -25,9 +27,9 @@ class Utilities(commands.Cog):
     @commands.command()
     async def list_files(self, ctx):
         """Lists files"""
-        server = ctx.guild.id 
+        server = ctx.guild.id
         try:
-            output_text = list_items(File,server)
+            output_text = list_items(File, server)
             await ctx.send(f"`{output_text}`")
         except:
             await ctx.send("Could not retrieve the list of files")
@@ -35,28 +37,33 @@ class Utilities(commands.Cog):
     @commands.command()
     async def list_binds(self, ctx):
         """Lists binds"""
-        server = ctx.guild.id 
+        server = ctx.guild.id
         try:
-            output_text = list_items(Bind,server)
+            output_text = list_items(Bind, server)
             await ctx.send(f"`{output_text}`")
         except:
             await ctx.send("Could not retrieve the list of files")
-    
+
     @commands.command()
-    async def list_groans(self,ctx):
-        server = ctx.guild.id 
+    async def list_groans(self, ctx):
+        server = ctx.guild.id
         with session_scope() as session:
-            #try:
-            for files, binds in session.query(File, Bind).join(File.alias == Bind.alias).filter_by(server=server).all():
+            # try:
+            for files, binds in (
+                session.query(File, Bind)
+                .join(File.alias == Bind.alias)
+                .filter_by(server=server)
+                .all()
+            ):
                 print(files)
                 files = files.alias
                 if len(files) == 0:
                     output_text = "Nothing found"
                 else:
-                    output_text = '\n'.join((item.alias) for item in files)
+                    output_text = "\n".join((item.alias) for item in files)
                 await ctx.send(f"`{output_text}`")
-            #except:
-                #await ctx.send("Could not retrieve the list of files")
+            # except:
+            # await ctx.send("Could not retrieve the list of files")
 
     """ @commands.command()
     async def reload_binds(self,ctx):
@@ -88,4 +95,3 @@ class Utilities(commands.Cog):
                 except Exception as e:
                     print(e)
                     print("Couldn't do") """
-                
