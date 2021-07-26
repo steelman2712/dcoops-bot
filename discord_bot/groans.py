@@ -1,9 +1,7 @@
-import asyncio
 from files import Binds, Files
 from music import YTDLSource
 import os
 from discord.ext import commands
-import ffmpeg
 import imgur
 import discord
 
@@ -51,7 +49,7 @@ class Groans(commands.Cog):
                 my_file = discord.File(cropped_audio)
                 message = await ctx.send(file=my_file)
                 cdn_url = message.attachments[0].url
-                bind = await Binds().upload_bind(ctx, cdn_url, alias)
+                await Binds().upload_bind(ctx, cdn_url, alias)
                 message = await ctx.send(imgur_link)
                 # await self.play(ctx=ctx,query=cdn_url)
                 await ctx.invoke(

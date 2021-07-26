@@ -14,7 +14,7 @@ def run_black():
 def run_flake8():
     try:
         subprocess.check_call(
-            "flake8 --ignore=E501 --exclude=venv/,alembic/", shell=True
+            "flake8 --ignore=E501,E402 --exclude=venv/,alembic/", shell=True
         )
     except Exception as e:
         print("flake8 failed")
@@ -23,7 +23,7 @@ def run_flake8():
 
 def run_ci():
     run_black()
-    # run_flake8()
+    run_flake8()
 
 
 if __name__ == "__main__":

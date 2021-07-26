@@ -40,7 +40,7 @@ class BaseFile:
         alias = alias.lower()
         server = ctx.guild.id
         with session_scope() as session:
-            query = (
+            query = (  # noqa: F841
                 session.query(class_type)
                 .filter_by(alias=alias)
                 .filter_by(server=server)
@@ -59,7 +59,7 @@ class BaseFile:
                 .filter_by(server=server)
                 .scalar()
             )
-            if exists != None:
+            if exists is not None:
                 return True
             else:
                 return False
@@ -81,7 +81,7 @@ class Files(BaseFile, commands.Cog):
             url = ctx.message.attachments[0].url
             await self._upload_file(ctx, alias, url)
             await ctx.send(f"Created {alias}")
-        except:
+        except Exception:
             await ctx.send(f"Could not create {alias}")
 
     @commands.command()
@@ -90,7 +90,7 @@ class Files(BaseFile, commands.Cog):
             print(f"Uploading new file with alias {alias}")
             await self._upload_file(ctx, alias, url)
             await ctx.send(f"Created {alias}")
-        except:
+        except Exception:
             await ctx.send(f"Could not create {alias}")
 
     @commands.command()
@@ -101,7 +101,7 @@ class Files(BaseFile, commands.Cog):
             await ctx.send(db_file.file_url)
         except NoResultFound:
             pass
-        except:
+        except Exception:
             raise
 
     @commands.command()
@@ -109,7 +109,7 @@ class Files(BaseFile, commands.Cog):
         try:
             await super().delete(ctx, alias=alias, class_type=File)
             await ctx.send(f"Deleted {alias}")
-        except:
+        except Exception:
             await ctx.send(f"Could not delete {alias}")
 
     @commands.command()
@@ -117,7 +117,7 @@ class Files(BaseFile, commands.Cog):
         try:
             await super().delete(ctx, alias=alias, class_type=Bind)
             await ctx.send(f"Deleted {alias}")
-        except:
+        except Exception:
             await ctx.send(f"Could not delete {alias}")
 
     async def exists(self, ctx, alias):
@@ -132,7 +132,7 @@ class Binds(BaseFile):
         await super().upload(db_file=db_file)
 
     async def load_bind(self, ctx, alias):
-        db_file = await super().load(ctx, alias, Bind)
+        await super().load(ctx, alias, Bind)
 
     async def exists(self, ctx, alias):
         exists = await super().exists(ctx, alias=alias, class_type=Bind)

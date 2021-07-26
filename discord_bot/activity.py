@@ -15,4 +15,4 @@ class Resident(commands.Cog):
 
 
 def setup(client):
-    client.add_cog(OnReady(client))
+    client.add_cog(Resident(client))

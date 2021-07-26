@@ -9,7 +9,6 @@ load_dotenv(dotenv_path)
 import sys
 
 sys.path.append(os.path.abspath(os.path.join(".", "discord_bot")))
-sys.path.append(os.path.abspath(os.path.join(".", "face-swap")))
 from music import Music
 from files import Files
 from utilities import Utilities

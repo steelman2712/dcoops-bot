@@ -6,17 +6,13 @@ import youtube_dl
 
 from discord.ext import commands
 
-from models.models import File, Bind
+from models.models import Bind
 from models.db import session_scope
 
-from files import Binds, Files
-import imgur
+from files import Binds
 
-import time
 import shlex
 import subprocess
-import moviepy.editor as mpy
-import ffmpeg
 
 # Suppress noise about console usage from errors
 CACHE_LOCATION = "video-cache"
@@ -60,7 +56,7 @@ async def audio_source_from_query(query, server):
             )
             bind = db_query.one()
             session.close()
-        except:
+        except Exception:
             bind = False
     if bind:
         source = discord.PCMVolumeTransformer(discord.FFmpegPCMAudio(bind.file_url))
@@ -167,23 +163,6 @@ class YTDLSource(discord.PCMVolumeTransformer):
         return filename
 
 
-class Queue:
-    queue = []
-
-    def __repr__(self):
-        message = "Queue: \n"
-        index = 1
-        for song in self.queue:
-            message += f"{index}) {song}"
-        return message
-
-    async def add(self, song):
-        self.queue.append(song)
-
-    async def remove(self, position):
-        del queue[i - 1]
-
-
 class Music(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
@@ -256,7 +235,6 @@ class Music(commands.Cog):
             uncropped_file = await YTDLSource.yt_download(url)
             print(uncropped_file)
             filename = os.path.splitext(uncropped_file)[0]
-            extension = os.path.splitext(uncropped_file)[1]
             cropped_name = f"{filename}+_out.mp3"
             cropped_file = await YTDLSource.crop(
                 input=uncropped_file, output=cropped_name, start=start, stop=stop
@@ -264,7 +242,7 @@ class Music(commands.Cog):
             my_file = discord.File(cropped_file)
             message = await ctx.send(file=my_file)
             cdn_url = message.attachments[0].url
-            bind = await Binds().upload_bind(ctx, cdn_url, alias)
+            await Binds().upload_bind(ctx, cdn_url, alias)
             os.remove(uncropped_file)
             os.remove(cropped_file)
             await self.play(ctx=ctx, query=cdn_url)

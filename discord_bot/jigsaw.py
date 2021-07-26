@@ -1,9 +1,7 @@
 import imgur
-import discord
 from discord.ext import commands
 
 import requests
-import asyncio
 import shutil
 from bs4 import BeautifulSoup
 

@@ -18,7 +18,6 @@ class Events(commands.Cog):
             return
         else:
             await self.ensure_voice(channel)
-            server = member.guild.id
             voice_client = member.guild.voice_client
             if member.nick:
                 name = member.nick
