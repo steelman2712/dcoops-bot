@@ -1,17 +1,15 @@
 import imgur
-import discord 
 from discord.ext import commands
 
 import requests
-import asyncio
 import shutil
-from bs4 import  BeautifulSoup
+from bs4 import BeautifulSoup
 
 JIGSAW_ERROR_MESSAGE = "Unable to create jigsaw"
 JIGSAW_EXPLORER_URL = "	https://www.jigsawexplorer.com/jigsaw-puzzle-result/"
 
-class Jigsaw(commands.Cog):
 
+class Jigsaw(commands.Cog):
     @commands.command()
     async def jigsaw(self, ctx, number_of_pieces=500):
         try:
@@ -24,14 +22,14 @@ class Jigsaw(commands.Cog):
         except Exception as e:
             print(e)
             await ctx.send(JIGSAW_ERROR_MESSAGE)
-    
-    async def download_image(self,discord_url):
+
+    async def download_image(self, discord_url):
         image_filename = discord_url.split("/")[-1]
         r = requests.get(discord_url, stream=True)
         if r.status_code == 200:
-        # Set decode_content value to True, otherwise the downloaded image file's size will be zero.
+            # Set decode_content value to True, otherwise the downloaded image file's size will be zero.
             r.raw.decode_content = True
-            with open(image_filename,'wb') as f:
+            with open(image_filename, "wb") as f:
                 shutil.copyfileobj(r.raw, f)
             return image_filename
         else:
@@ -43,10 +41,10 @@ class Jigsaw(commands.Cog):
             "credit-line": "",
             "credit-url": "",
             "puzzle-nop": number_of_pieces,
-            "color": "blue"
+            "color": "blue",
         }
         return json_data
-    
+
     async def create_jigsaw(self, imgur_link, number_of_pieces):
         json_data = await self.create_jigsaw_data(imgur_link, number_of_pieces)
         print(json_data)

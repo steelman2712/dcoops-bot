@@ -11,10 +11,11 @@ password = os.environ.get("DB_PASSWORD")
 host = os.environ.get("DB_HOST")
 port = os.environ.get("DB_PORT")
 
-sqlalchemy_url = f'mysql+pymysql://{user}:{password}@{host}:{port}/discord'
+sqlalchemy_url = f"mysql+pymysql://{user}:{password}@{host}:{port}/discord"
 
 sqlalchemy.engine = sqlalchemy.create_engine(sqlalchemy_url, echo=False)
 Session = sessionmaker(sqlalchemy.engine)
+
 
 @contextmanager
 def session_scope():
@@ -23,9 +24,8 @@ def session_scope():
     try:
         yield session
         session.commit()
-    except:
+    except Exception:
         session.rollback()
         raise
     finally:
         session.close()
-    
