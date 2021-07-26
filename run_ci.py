@@ -1,5 +1,15 @@
 import subprocess
 
+def run_black():
+    try:
+        subprocess.check_call(
+            "black --check --exclude 'venv/*|alembic/*' .",
+            shell=True
+        )
+    except Exception as e:
+        print("black failed")
+        print(e)
+
 def run_flake8():
     try:
         subprocess.check_call(
@@ -11,7 +21,8 @@ def run_flake8():
         print(e)
 
 def run_ci():
-    run_flake8()
+    run_black()
+    #run_flake8()
 
 if __name__ == "__main__":
     run_ci()
