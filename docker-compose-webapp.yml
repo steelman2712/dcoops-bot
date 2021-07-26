@@ -31,6 +31,21 @@ services:
         source: d4e21b5cb2d3eee9ffffa2e040bd701c11108e32f1c1247fa24a28b8e6c667ea
         target: /var/lib/mysql
 
+  webapp:
+    build:
+      context: ./web-app/backend
+      dockerfile: Dockerfile
+    restart: on-failure
+    env_file: ./web-app/backend/.env
+    networks:
+      - core-network
+    volumes:
+      - type: bind
+        source: ./web-app
+        target: /home/backenduser
+    links:
+    - 'mysql'
+
 volumes: 
   d4e21b5cb2d3eee9ffffa2e040bd701c11108e32f1c1247fa24a28b8e6c667ea:
     external: true
