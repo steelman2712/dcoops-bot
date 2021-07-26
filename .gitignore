@@ -4,8 +4,8 @@ video-cache/
 *.mp4
 *.jpg
 *.gif
-*.PNG 
-*.png 
+*.png
+*.PNG
 *.mp3
 # Byte-compiled / optimized / DLL files
 __pycache__/

@@ -1,6 +1,7 @@
 import os 
 from dotenv import load_dotenv
 from discord.ext import commands
+from pretty_help import PrettyHelp
 
 dotenv_path = os.path.join(os.path.dirname(__file__), '.env')
 load_dotenv(dotenv_path)
@@ -14,12 +15,13 @@ from utilities import Utilities
 from activity import Resident
 from face_swap import FaceSwap
 from groans import Groans
-
+from jigsaw import Jigsaw
+from events import Events
 
 
 
 bot = commands.Bot(command_prefix=commands.when_mentioned_or("!"),
-                   description='DCoops bot', case_insensitive=True)
+                   description='DCoops bot', case_insensitive=True, help_command=PrettyHelp())
 
 
 @bot.event
@@ -36,4 +38,6 @@ bot.add_cog(Utilities(bot))
 bot.add_cog(Resident(bot))
 bot.add_cog(FaceSwap(bot))
 bot.add_cog(Groans(bot))
+bot.add_cog(Jigsaw(bot))
+bot.add_cog(Events(bot))
 bot.run(token)

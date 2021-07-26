@@ -52,3 +52,17 @@ async def upload_video(video_file):
     await wait_until_processed(upload_id, client_id)
     return link
     
+async def upload_image(image_file):
+    with open(image_file,"rb") as image:
+        data = {
+            'image': image.read(),
+            'type': "file",
+        }
+        response = requests.post(url=url,files={"image":open(image_file,"rb")},headers={'Authorization': f"Client-ID {client_id}"},data=data)
+    response = json.loads(response.content)
+    data = response.get("data")
+    upload_id = data.get("id")
+    link = data.get("link")
+    link = link.replace("https://i.imgur","http://imgur")
+    print(link)
+    return link

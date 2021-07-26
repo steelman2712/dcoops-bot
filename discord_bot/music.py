@@ -50,6 +50,21 @@ ytdl_video_options["format"]="bestvideo[height<=480,ext=mp4]+bestaudio[ext=m4a]/
 ytdl = youtube_dl.YoutubeDL(ytdl_format_options)
 ytdl_video = youtube_dl.YoutubeDL(ytdl_video_options)
 
+async def audio_source_from_query(query, server):
+    with session_scope() as session:
+        query = query.lower()
+        try:
+            db_query = session.query(Bind).filter_by(alias=query).filter_by(server=server)
+            bind = db_query.one()
+            session.close()
+        except:
+            bind = False
+    if bind:
+        source = discord.PCMVolumeTransformer(discord.FFmpegPCMAudio(bind.file_url))
+    else:
+        source = discord.PCMVolumeTransformer(discord.FFmpegPCMAudio(query))
+    return source
+
 class YTDLSource(discord.PCMVolumeTransformer):
        
     def __init__(self, source, *, data, volume=0.5):
@@ -171,18 +186,7 @@ class Music(commands.Cog):
     async def play(self, ctx, *, query):
         """Plays a file from the local filesystem"""
         server = ctx.guild.id 
-        with session_scope() as session:
-            query = query.lower()
-            try:
-                db_query = session.query(Bind).filter_by(alias=query).filter_by(server=server)
-                bind = db_query.one()
-                session.close()
-            except:
-                bind = False
-        if bind:
-            source = discord.PCMVolumeTransformer(discord.FFmpegPCMAudio(bind.file_url))
-        else:
-            source = discord.PCMVolumeTransformer(discord.FFmpegPCMAudio(query))
+        source = await audio_source_from_query(query = query, server = server)
         ctx.voice_client.play(source, after=lambda e: print('Player error: %s' % e) if e else None)
 
         #await ctx.send('Now playing: {}'.format(query))
