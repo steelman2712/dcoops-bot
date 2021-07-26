@@ -13,7 +13,6 @@ from music import Music
 from files import Files
 from utilities import Utilities
 from activity import Resident
-from face_swap import FaceSwap
 from groans import Groans
 from jigsaw import Jigsaw
 from events import Events
@@ -36,7 +35,6 @@ bot.add_cog(Music(bot))
 bot.add_cog(Files(bot))
 bot.add_cog(Utilities(bot))
 bot.add_cog(Resident(bot))
-bot.add_cog(FaceSwap(bot))
 bot.add_cog(Groans(bot))
 bot.add_cog(Jigsaw(bot))
 bot.add_cog(Events(bot))
