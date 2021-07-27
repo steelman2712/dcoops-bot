@@ -250,6 +250,9 @@ class Music(commands.Cog):
     @commands.command()
     async def groans(self, ctx, alias="groans"):
         """Plays a bind and loads an image at the same time"""
+        if alias == "random":
+            random_bind = await Binds().random(ctx)
+            alias = random_bind.alias
         await self.play(ctx=ctx, query=alias)
         await ctx.invoke(self.bot.get_command("load"), alias=alias)
 

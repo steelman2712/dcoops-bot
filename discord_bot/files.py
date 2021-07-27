@@ -6,6 +6,7 @@ from models.db import session_scope
 
 audio_files = (".mp3", ".wav", ".ogg", ".webm", ".m4a")
 from sqlalchemy.orm.exc import NoResultFound
+import random
 
 
 def create_file(alias, url, server):
@@ -59,10 +60,19 @@ class BaseFile:
                 .filter_by(server=server)
                 .scalar()
             )
+            session.close()
             if exists is not None:
                 return True
             else:
                 return False
+
+    async def random(self,server,class_type):
+        with session_scope() as session:
+            query = session.query(class_type).filter_by(server=server)
+            rowCount = int(query.count())
+            randomRow = query.offset(int(rowCount*random.random())).first()
+            session.close()
+        return randomRow
 
 
 class Files(BaseFile, commands.Cog):
@@ -123,7 +133,7 @@ class Files(BaseFile, commands.Cog):
     async def exists(self, ctx, alias):
         exists = await super().exists(ctx, alias=alias, class_type=File)
         return exists
-
+    
 
 class Binds(BaseFile):
     async def upload_bind(self, ctx, url, alias):
@@ -137,3 +147,7 @@ class Binds(BaseFile):
     async def exists(self, ctx, alias):
         exists = await super().exists(ctx, alias=alias, class_type=Bind)
         return exists
+    
+    async def random(self,ctx):
+        bind = await super().random(server=ctx.guild.id,class_type=Bind)
+        return bind
