@@ -23,20 +23,21 @@ class Events(commands.Cog):
                 name = member.nick
             else:
                 name = member.name
-            if before.channel is None:
-                await tts_to_file(f"{name} has joined the voice channel")
-                await self.play_file(voice_client=voice_client)
-            elif after.channel is None:
-                await tts_to_file(f"{name} has left the voice channel")
-                await self.play_file(voice_client=voice_client)
+            print("Before", before)
+            print("After", after)
+            if await self.has_joined(before,after):
+                tts_message = f"{name} has joined the voice channel"
+                await self.play_tts(voice_client=voice_client,message=tts_message)
+            elif await self.has_left(before,after):
+                tts_message = f"{name} has left the voice channel"
+                await self.play_tts(voice_client=voice_client, message=tts_message)
+            elif await self.has_muted_mic(before,after) or await self.has_unmuted_mic(before,after):
+                await self.play_bind(server=member.guild.id,voice_client=voice_client,groan="groans")
             else:
                 return
-            # await self.play_groan(server=server, voice_client = voice_client, groan="groans")
 
     @commands.Cog.listener()
     async def on_message_delete(self, message):
-        print(message)
-        print(message.attachments)
         attachment_urls = None
         if message.attachments:
             attachment_url_list = [attachment.url for attachment in message.attachments]
@@ -44,6 +45,8 @@ class Events(commands.Cog):
             print(attachment_urls)
         channel = message.channel
         author = message.author.name
+        if len(message.content) > 1500:
+            message.content = message.content[:1500]
         if attachment_urls:
             message = f"{author} deleted message. Message contents: {message.content}. Attached file(s): {attachment_urls}"
         else:
@@ -55,17 +58,49 @@ class Events(commands.Cog):
         print(before)
         print(after)
 
-    async def play_groan(self, server, voice_client, groan="groans"):
+    async def has_joined(self,before,after):
+        if before.channel is None:
+            return True
+        else:
+            return False
+
+    async def has_left(self,before,after):
+        if after.channel is None:
+            return True
+        else:
+            return False
+        
+    async def has_muted_mic(self,before,after):
+        if not before.self_mute and after.self_mute:
+            return True
+        else:
+            return False
+    
+    async def has_unmuted_mic(self,before,after):
+        if before.self_mute and not after.self_mute:
+            return True
+        else:
+            return False
+
+
+
+
+    async def play_bind(self, server, voice_client, groan="groans"):
         source = await audio_source_from_query(server=server, query=groan)
         voice_client.play(
             source, after=lambda e: print("Player error: %s" % e) if e else None
         )
 
-    async def play_file(self, voice_client, filename="tts.mp3"):
+    async def play_file(self, voice_client, filename):
         source = discord.PCMVolumeTransformer(discord.FFmpegPCMAudio(filename))
         voice_client.play(
             source, after=lambda e: print("Player error: %s" % e) if e else None
         )
+
+    async def play_tts(self,voice_client,message):
+        await tts_to_file(message)
+        await self.play_file(voice_client=voice_client,filename="tts.mp3")
+
 
     async def send_message(self, channel, message):
         await channel.send(message)
