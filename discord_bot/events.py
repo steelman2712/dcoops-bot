@@ -3,6 +3,22 @@ from discord.ext import commands
 from music import audio_source_from_query
 from tts import tts_to_file
 
+async def play_bind(server, voice_client, groan="groans"):
+    source = await audio_source_from_query(server=server, query=groan)
+    voice_client.play(
+        source, after=lambda e: print("Player error: %s" % e) if e else None
+    )
+
+async def play_file(voice_client, filename):
+    source = discord.PCMVolumeTransformer(discord.FFmpegPCMAudio(filename))
+    voice_client.play(
+        source, after=lambda e: print("Player error: %s" % e) if e else None
+    )
+
+async def play_tts(voice_client,message):
+    await tts_to_file(message)
+    await play_file(voice_client=voice_client,filename="tts.mp3")
+
 
 class Events(commands.Cog):
     def __init__(self, bot):
@@ -23,26 +39,23 @@ class Events(commands.Cog):
                 name = member.nick
             else:
                 name = member.name
-            print("Before", before)
-            print("After", after)
             if await self.has_joined(before,after):
                 tts_message = f"{name} has joined the voice channel"
-                await self.play_tts(voice_client=voice_client,message=tts_message)
+                await play_tts(voice_client=voice_client,message=tts_message)
             elif await self.has_left(before,after):
-                tts_message = f"{name} has left the voice channel"
-                await self.play_tts(voice_client=voice_client, message=tts_message)
-            elif await self.has_muted_mic(before,after) or await self.has_unmuted_mic(before,after):
-                await self.play_bind(server=member.guild.id,voice_client=voice_client,groan="groans")
+                tts_message = f"{name} has left the bloody bastard voice channel"
+                await play_tts(voice_client=voice_client, message=tts_message)
+            #elif await self.has_muted_mic(before,after) or await self.has_unmuted_mic(before,after):
+                #await play_bind(server=member.guild.id,voice_client=voice_client,groan="groans")
             else:
                 return
 
-    @commands.Cog.listener()
+    #@commands.Cog.listener()
     async def on_message_delete(self, message):
         attachment_urls = None
         if message.attachments:
             attachment_url_list = [attachment.url for attachment in message.attachments]
             attachment_urls = " ".join(attachment_url_list)
-            print(attachment_urls)
         channel = message.channel
         author = message.author.name
         if len(message.content) > 1500:
@@ -55,8 +68,12 @@ class Events(commands.Cog):
 
     @commands.Cog.listener()
     async def on_message_edit(self, before, after):
-        print(before)
-        print(after)
+        print("Edited")
+        self.bot.dispatch("my_event")
+
+    @commands.Cog.listener()
+    async def on_my_event(self):
+        print("Test")
 
     async def has_joined(self,before,after):
         if before.channel is None:
@@ -85,21 +102,7 @@ class Events(commands.Cog):
 
 
 
-    async def play_bind(self, server, voice_client, groan="groans"):
-        source = await audio_source_from_query(server=server, query=groan)
-        voice_client.play(
-            source, after=lambda e: print("Player error: %s" % e) if e else None
-        )
-
-    async def play_file(self, voice_client, filename):
-        source = discord.PCMVolumeTransformer(discord.FFmpegPCMAudio(filename))
-        voice_client.play(
-            source, after=lambda e: print("Player error: %s" % e) if e else None
-        )
-
-    async def play_tts(self,voice_client,message):
-        await tts_to_file(message)
-        await self.play_file(voice_client=voice_client,filename="tts.mp3")
+    
 
 
     async def send_message(self, channel, message):
