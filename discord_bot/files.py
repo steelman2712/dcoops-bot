@@ -66,11 +66,11 @@ class BaseFile:
             else:
                 return False
 
-    async def random(self,server,class_type):
+    async def random(self, server, class_type):
         with session_scope() as session:
             query = session.query(class_type).filter_by(server=server)
             rowCount = int(query.count())
-            randomRow = query.offset(int(rowCount*random.random())).first()
+            randomRow = query.offset(int(rowCount * random.random())).first()
             session.close()
         return randomRow
 
@@ -133,7 +133,7 @@ class Files(BaseFile, commands.Cog):
     async def exists(self, ctx, alias):
         exists = await super().exists(ctx, alias=alias, class_type=File)
         return exists
-    
+
 
 class Binds(BaseFile):
     async def upload_bind(self, ctx, url, alias):
@@ -147,7 +147,7 @@ class Binds(BaseFile):
     async def exists(self, ctx, alias):
         exists = await super().exists(ctx, alias=alias, class_type=Bind)
         return exists
-    
-    async def random(self,ctx):
-        bind = await super().random(server=ctx.guild.id,class_type=Bind)
+
+    async def random(self, ctx):
+        bind = await super().random(server=ctx.guild.id, class_type=Bind)
         return bind

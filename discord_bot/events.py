@@ -3,11 +3,13 @@ from discord.ext import commands
 from music import audio_source_from_query
 from tts import tts_to_file
 
+
 async def play_bind(server, voice_client, groan="groans"):
     source = await audio_source_from_query(server=server, query=groan)
     voice_client.play(
         source, after=lambda e: print("Player error: %s" % e) if e else None
     )
+
 
 async def play_file(voice_client, filename):
     source = discord.PCMVolumeTransformer(discord.FFmpegPCMAudio(filename))
@@ -15,9 +17,10 @@ async def play_file(voice_client, filename):
         source, after=lambda e: print("Player error: %s" % e) if e else None
     )
 
-async def play_tts(voice_client,message):
+
+async def play_tts(voice_client, message):
     await tts_to_file(message)
-    await play_file(voice_client=voice_client,filename="tts.mp3")
+    await play_file(voice_client=voice_client, filename="tts.mp3")
 
 
 class Events(commands.Cog):
@@ -39,18 +42,18 @@ class Events(commands.Cog):
                 name = member.nick
             else:
                 name = member.name
-            if await self.has_joined(before,after):
+            if await self.has_joined(before, after):
                 tts_message = f"{name} has joined the voice channel"
-                await play_tts(voice_client=voice_client,message=tts_message)
-            elif await self.has_left(before,after):
+                await play_tts(voice_client=voice_client, message=tts_message)
+            elif await self.has_left(before, after):
                 tts_message = f"{name} has left the bloody bastard voice channel"
                 await play_tts(voice_client=voice_client, message=tts_message)
-            #elif await self.has_muted_mic(before,after) or await self.has_unmuted_mic(before,after):
-                #await play_bind(server=member.guild.id,voice_client=voice_client,groan="groans")
+            # elif await self.has_muted_mic(before,after) or await self.has_unmuted_mic(before,after):
+            # await play_bind(server=member.guild.id,voice_client=voice_client,groan="groans")
             else:
                 return
 
-    #@commands.Cog.listener()
+    # @commands.Cog.listener()
     async def on_message_delete(self, message):
         attachment_urls = None
         if message.attachments:
@@ -75,35 +78,29 @@ class Events(commands.Cog):
     async def on_my_event(self):
         print("Test")
 
-    async def has_joined(self,before,after):
+    async def has_joined(self, before, after):
         if before.channel is None:
             return True
         else:
             return False
 
-    async def has_left(self,before,after):
+    async def has_left(self, before, after):
         if after.channel is None:
             return True
         else:
             return False
-        
-    async def has_muted_mic(self,before,after):
+
+    async def has_muted_mic(self, before, after):
         if not before.self_mute and after.self_mute:
             return True
         else:
             return False
-    
-    async def has_unmuted_mic(self,before,after):
+
+    async def has_unmuted_mic(self, before, after):
         if before.self_mute and not after.self_mute:
             return True
         else:
             return False
-
-
-
-
-    
-
 
     async def send_message(self, channel, message):
         await channel.send(message)
