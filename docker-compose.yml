@@ -6,6 +6,8 @@ services:
       context: .
       dockerfile: Dockerfile
     restart: always
+    networks:
+      - dcoops-network
     ports:
       - '8000:8000'
     volumes:
@@ -14,12 +16,17 @@ services:
         target: /discord
     links:
       - 'mysql'
+    depends_on:
+      - mysql
+      - rabbitMQ
 
   mysql:
     image: mysql/mysql-server:latest
     restart: always
     ports:
       - '3306:3306'
+    networks:
+      - dcoops-network
     environment:
       - MYSQL_ROOT_PASSWORD=root
       - MYSQL_USER=${DB_USERNAME}
@@ -30,6 +37,42 @@ services:
       - type: volume
         source: d4e21b5cb2d3eee9ffffa2e040bd701c11108e32f1c1247fa24a28b8e6c667ea
         target: /var/lib/mysql
+
+  webapp:
+    build:
+      context: ./web-app/backend
+      dockerfile: Dockerfile
+    restart: on-failure
+    env_file: ./web-app/backend/.env
+    networks:
+      - dcoops-network
+      - core-network
+    volumes:
+      - type: bind
+        source: ./web-app/backend
+        target: /home/backenduser
+    links:
+      - 'mysql'
+      - 'rabbitMQ'
+    depends_on:
+      - mysql
+      - rabbitMQ
+  
+  rabbitMQ:
+    image: rabbitmq:3.9-management
+    restart: always
+    networks:
+      - dcoops-network
+    ports: 
+      - '5672:5672'
+      - '15672:15672'
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:15672"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    logging:
+      driver: none
 
 volumes: 
   d4e21b5cb2d3eee9ffffa2e040bd701c11108e32f1c1247fa24a28b8e6c667ea:
