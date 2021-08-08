@@ -17,9 +17,11 @@ from utilities import Utilities
 from activity import Resident
 from groans import Groans
 from jigsaw import Jigsaw
-from events import Events, play_bind
+from events import Events, play_bind, play_tts
 from threading import Thread
 import pika
+
+TEST_SERVER = 123456789
 
 bot = commands.Bot(
     command_prefix=commands.when_mentioned_or("!"),
@@ -50,9 +52,21 @@ def get_connection():
     return conn
 
 
-async def my_event():
+async def rabbit_groans():
     try:
-        server_id = 123456789
+        server_id = TEST_SERVER
+        guild = bot.get_guild(server_id)
+        print(guild)
+        voice_client = discord.utils.get(bot.voice_clients, guild=guild)
+        print(voice_client)
+        await play_bind(server=server_id, voice_client=voice_client)
+    except Exception as e:
+        print("Error on callback: ", e)
+        return None
+
+async def rabbit_tts():
+    try:
+        server_id = TEST_SERVER
         guild = bot.get_guild(server_id)
         print(guild)
         voice_client = discord.utils.get(bot.voice_clients, guild=guild)
@@ -63,9 +77,27 @@ async def my_event():
         return None
 
 
+async def on_rabbitmq_message(text):
+    try:
+        server_id = TEST_SERVER
+        guild = bot.get_guild(server_id)
+        print(guild)
+        voice_client = discord.utils.get(bot.voice_clients, guild=guild)
+        if text.startswith("groans"):
+            bind = text.split()[1] 
+            if not bind:
+                bind = "groans"
+            await play_bind(server=server_id, voice_client=voice_client, groan=bind)
+        else:
+            await play_tts(voice_client=voice_client, message=text)
+    except Exception as e:
+        print("Error on callback: ", e)
+        return None
+
 def callback(ch, method, properties, body):
-    print(" [x] %s" % (body))
-    asyncio.run(my_event())
+    text = body.decode("utf-8")
+    print("Rabbitmq message: ",text)
+    asyncio.run(on_rabbitmq_message(text))
 
 
 def start_consumers():

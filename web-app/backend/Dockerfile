@@ -1,5 +1,7 @@
 FROM python:3.8
 
+RUN pip install --upgrade pip
+
 COPY requirements.txt requirements_from_github.txt /tmp/
 RUN pip install -r /tmp/requirements.txt
 
@@ -13,4 +15,4 @@ USER backenduser
 
 COPY . .
 
-CMD ["gunicorn", "app:app", "-b", "0.0.0.0:5000"]
+CMD ["gunicorn", "-c", "gunicorn.conf.py", "app:app", "-b", "0.0.0.0:5000", "--access-logfile", "-"]
