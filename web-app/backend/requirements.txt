@@ -2,3 +2,5 @@ flask
 gunicorn
 python-dotenv
 pika==1.2.0
+Flask-Discord
+werkzeug
