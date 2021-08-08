@@ -6,11 +6,10 @@ import discord
 
 from pathlib import Path
 import sys
-from pathlib import Path # if you haven't already done so
+
 file = Path(__file__).resolve()
 parent, root = file.parent, file.parents[1]
 sys.path.append(str(root))
-
 
 
 dotenv_path = os.path.join(os.path.dirname(__file__), ".env")
@@ -19,7 +18,7 @@ load_dotenv(dotenv_path)
 import sys
 import asyncio
 
-#sys.path.append(root_path)
+# sys.path.append(root_path)
 from dcoops.bot.music import Music
 from dcoops.bot.files import Files
 from dcoops.bot.utilities import Utilities
@@ -73,6 +72,7 @@ async def rabbit_groans():
         print("Error on callback: ", e)
         return None
 
+
 async def rabbit_tts():
     try:
         server_id = TEST_SERVER
@@ -93,7 +93,7 @@ async def on_rabbitmq_message(text):
         print(guild)
         voice_client = discord.utils.get(bot.voice_clients, guild=guild)
         if text.startswith("groans"):
-            bind = text.split()[1] 
+            bind = text.split()[1]
             if not bind:
                 bind = "groans"
             await play_bind(server=server_id, voice_client=voice_client, groan=bind)
@@ -103,9 +103,10 @@ async def on_rabbitmq_message(text):
         print("Error on callback: ", e)
         return None
 
+
 def callback(ch, method, properties, body):
     text = body.decode("utf-8")
-    print("Rabbitmq message: ",text)
+    print("Rabbitmq message: ", text)
     asyncio.run(on_rabbitmq_message(text))
 
 

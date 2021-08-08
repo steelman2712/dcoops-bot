@@ -7,11 +7,13 @@ import discord
 
 from os.path import dirname
 
+
 def get_cache_location():
     CACHE_LOCATION = "video-cache"
     root_discord_directory = dirname(dirname(__file__))
     cache_directory = os.path.join(root_discord_directory, CACHE_LOCATION)
     return cache_directory
+
 
 class Groans(commands.Cog):
     def __init__(self, bot):
