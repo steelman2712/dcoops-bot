@@ -15,7 +15,7 @@ class File(Base):
     __table_args__ = (UniqueConstraint(alias, server),)
 
     def __repr__(self):
-        return f"""<File(file_url = ${self.file_url}, server=${self.server})>"""
+        return f"""<File(alias=${self.alias}, file_url = ${self.file_url}, server=${self.server})>"""
 
 
 class Bind(Base):
@@ -29,4 +29,9 @@ class Bind(Base):
     __table_args__ = (UniqueConstraint(alias, server),)
 
     def __repr__(self):
-        return f"""<Bind(file_url = ${self.file_url}, server=${self.server})>"""
+        return f"""<Bind(alias=${self.alias}, file_url = ${self.file_url}, server=${self.server})>"""
+
+
+class Settings(Base):
+    __tablename__ = "settings"
+    server = Column(String(32), nullable=False, unique=True, primary_key=True)
