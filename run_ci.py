@@ -2,6 +2,7 @@ import subprocess
 
 failures = []
 
+
 def run_black():
     try:
         subprocess.check_call(
@@ -25,11 +26,9 @@ def run_flake8():
 
 
 def raise_error_on_failure():
-
-
-
     if failures:
         raise AssertionError
+
 
 def run_ci():
     run_black()
