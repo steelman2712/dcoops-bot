@@ -1,4 +1,4 @@
-import imgur
+import dcoops.bot.imgur as imgur
 from discord.ext import commands
 
 import requests

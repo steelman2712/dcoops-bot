@@ -4,20 +4,28 @@ from discord.ext import commands
 from pretty_help import PrettyHelp
 import discord
 
+from pathlib import Path
+import sys
+
+file = Path(__file__).resolve()
+parent, root = file.parent, file.parents[1]
+sys.path.append(str(root))
+
+
 dotenv_path = os.path.join(os.path.dirname(__file__), ".env")
 load_dotenv(dotenv_path)
 
 import sys
 import asyncio
 
-sys.path.append(os.path.abspath(os.path.join(".", "discord_bot")))
-from music import Music
-from files import Files
-from utilities import Utilities
-from activity import Resident
-from groans import Groans
-from jigsaw import Jigsaw
-from events import Events, play_bind, play_tts
+# sys.path.append(root_path)
+from dcoops.bot.music import Music
+from dcoops.bot.files import Files
+from dcoops.bot.utilities import Utilities
+from dcoops.bot.activity import Resident
+from dcoops.bot.groans import Groans
+from dcoops.bot.jigsaw import Jigsaw
+from dcoops.bot.events import Events, play_bind, play_tts
 from threading import Thread
 import pika
 
@@ -64,6 +72,7 @@ async def rabbit_groans():
         print("Error on callback: ", e)
         return None
 
+
 async def rabbit_tts():
     try:
         server_id = TEST_SERVER
@@ -84,7 +93,7 @@ async def on_rabbitmq_message(text):
         print(guild)
         voice_client = discord.utils.get(bot.voice_clients, guild=guild)
         if text.startswith("groans"):
-            bind = text.split()[1] 
+            bind = text.split()[1]
             if not bind:
                 bind = "groans"
             await play_bind(server=server_id, voice_client=voice_client, groan=bind)
@@ -94,9 +103,10 @@ async def on_rabbitmq_message(text):
         print("Error on callback: ", e)
         return None
 
+
 def callback(ch, method, properties, body):
     text = body.decode("utf-8")
-    print("Rabbitmq message: ",text)
+    print("Rabbitmq message: ", text)
     asyncio.run(on_rabbitmq_message(text))
 
 

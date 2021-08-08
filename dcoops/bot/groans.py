@@ -1,11 +1,18 @@
-from files import Binds, Files
-from music import YTDLSource
+from dcoops.bot.files import Binds, Files
+from dcoops.bot.music import YTDLSource
 import os
 from discord.ext import commands
-import imgur
+import dcoops.bot.imgur as imgur
 import discord
 
-CACHE_LOCATION = "video-cache"
+from os.path import dirname
+
+
+def get_cache_location():
+    CACHE_LOCATION = "video-cache"
+    root_discord_directory = dirname(dirname(__file__))
+    cache_directory = os.path.join(root_discord_directory, CACHE_LOCATION)
+    return cache_directory
 
 
 class Groans(commands.Cog):
@@ -70,8 +77,7 @@ class Groans(commands.Cog):
             return False
 
     async def is_cached(self, filename):
-        root_dir = os.path.dirname(os.path.dirname(__file__))
-        cache_directory = os.path.join(root_dir, CACHE_LOCATION)
+        cache_directory = get_cache_location()
         filepath = os.path.join(cache_directory, filename)
         if os.path.isfile(filepath):
             return True

@@ -1,7 +1,7 @@
 import discord
 from discord.ext import commands
-from music import audio_source_from_query
-from tts import tts_to_file
+from dcoops.bot.music import audio_source_from_query
+from dcoops.bot.tts import tts_to_file
 
 
 async def play_bind(server, voice_client, groan="groans"):

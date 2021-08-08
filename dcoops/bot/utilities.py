@@ -1,7 +1,7 @@
 from discord.ext import commands
 
-from models.models import File, Bind
-from models.db import session_scope
+from dcoopsdb.models import File, Bind
+from dcoopsdb.db import session_scope
 
 
 def list_items(item_class, server):
