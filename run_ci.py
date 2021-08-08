@@ -20,14 +20,14 @@ def run_flake8():
         )
     except Exception as e:
         print("flake8 failed")
-        failures.appenf("flake8")
+        failures.append("flake8")
         print(e)
 
 
 def raise_error_on_failure():
 
 
-    
+
     if failures:
         raise AssertionError
 
