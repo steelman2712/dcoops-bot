@@ -6,10 +6,10 @@ import youtube_dl
 
 from discord.ext import commands
 
-from models.models import Bind
-from models.db import session_scope
+from dcoopsdb.models import Bind
+from dcoopsdb.db import session_scope
 
-from files import Binds
+from dcoops.bot.files import Binds
 
 import shlex
 import subprocess

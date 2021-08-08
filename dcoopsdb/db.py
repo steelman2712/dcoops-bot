@@ -1,8 +1,6 @@
 import sqlalchemy
 from sqlalchemy.orm import sessionmaker
-
 import os
-
 from contextlib import contextmanager
 
 

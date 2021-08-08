@@ -1,8 +1,8 @@
 from discord.ext import commands
 
 dictionary = {}
-from models.models import File, Bind
-from models.db import session_scope
+from dcoopsdb.models import File, Bind
+from dcoopsdb.db import session_scope
 
 audio_files = (".mp3", ".wav", ".ogg", ".webm", ".m4a")
 from sqlalchemy.orm.exc import NoResultFound

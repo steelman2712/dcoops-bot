@@ -4,20 +4,29 @@ from discord.ext import commands
 from pretty_help import PrettyHelp
 import discord
 
+from pathlib import Path
+import sys
+from pathlib import Path # if you haven't already done so
+file = Path(__file__).resolve()
+parent, root = file.parent, file.parents[1]
+sys.path.append(str(root))
+
+
+
 dotenv_path = os.path.join(os.path.dirname(__file__), ".env")
 load_dotenv(dotenv_path)
 
 import sys
 import asyncio
 
-sys.path.append(os.path.abspath(os.path.join(".", "discord_bot")))
-from music import Music
-from files import Files
-from utilities import Utilities
-from activity import Resident
-from groans import Groans
-from jigsaw import Jigsaw
-from events import Events, play_bind, play_tts
+#sys.path.append(root_path)
+from dcoops.bot.music import Music
+from dcoops.bot.files import Files
+from dcoops.bot.utilities import Utilities
+from dcoops.bot.activity import Resident
+from dcoops.bot.groans import Groans
+from dcoops.bot.jigsaw import Jigsaw
+from dcoops.bot.events import Events, play_bind, play_tts
 from threading import Thread
 import pika
 
