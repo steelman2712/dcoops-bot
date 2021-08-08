@@ -1,5 +1,7 @@
 import subprocess
 
+failures = []
+
 
 def run_black():
     try:
@@ -8,6 +10,7 @@ def run_black():
         )
     except Exception as e:
         print("black failed")
+        failures.append("black")
         print(e)
 
 
@@ -18,12 +21,19 @@ def run_flake8():
         )
     except Exception as e:
         print("flake8 failed")
+        failures.append("flake8")
         print(e)
+
+
+def raise_error_on_failure():
+    if failures:
+        raise AssertionError
 
 
 def run_ci():
     run_black()
     run_flake8()
+    raise_error_on_failure()
 
 
 if __name__ == "__main__":
