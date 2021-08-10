@@ -15,9 +15,14 @@ load_dotenv(dotenv_path)
 
 # Bring discord_bot onto the path
 import sys, os
-sys.path.append(os.path.abspath(os.path.join('.', 'discord_bot','models')))
-print(sys.path)
-import models, db
+from pathlib import Path
+file = Path(__file__).resolve()
+parent, root = file.parent, file.parents[1]
+sys.path.append(str(root))
+
+
+import dcoopsdb.models as models
+import dcoopsdb.db as db
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
 config = context.config

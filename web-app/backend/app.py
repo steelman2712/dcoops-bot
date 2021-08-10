@@ -12,6 +12,14 @@ from werkzeug.middleware.proxy_fix import ProxyFix
 
 # while True:
 #    time.sleep(10)
+from pathlib import Path
+
+file = Path(__file__).resolve()
+parent, root = file.parent, file.parents[1]
+sys.path.append(str(root))
+
+from dcoopsdb.db import db
+from dcoopsdb.models import File, Bind
 
 
 app = Flask(__name__)
