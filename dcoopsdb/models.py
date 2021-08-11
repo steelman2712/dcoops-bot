@@ -3,27 +3,11 @@ from sqlalchemy import Column, Integer, String, UniqueConstraint
 
 from dcoopsdb.db import session_scope
 
-Base = declarative_base()
+
 
 class BaseFile(object):
 
     __abstract__ = True
-
-    @declared_attr
-    def __tablename__(cls):
-        return f"{cls.__name__.lower()}s"
-
-    id = Column(Integer, primary_key=True)
-    alias = Column(String(256), nullable=False)
-    file_url = Column(String(256), nullable=False)
-    server = Column(String(32), nullable=False)
-
-    __table_args__ = (UniqueConstraint(alias, server),)
-
-    @classmethod
-    def upload(cls, db_file):
-        with session_scope() as session:
-            session.add(db_file)
 
     @classmethod
     def load(cls, server, alias):
@@ -77,15 +61,31 @@ class BaseFile(object):
             session.close()
         return randomRow
 
-class File(Base, BaseFile):
+Base = declarative_base(cls=BaseFile)
+
+class File(Base):
     __tablename__ = "files"
+
+    id = Column(Integer, primary_key=True)
+    alias = Column(String(256), nullable=False)
+    file_url = Column(String(256), nullable=False)
+    server = Column(String(32), nullable=False)
+
+    __table_args__ = (UniqueConstraint(alias, server),)
 
     def __repr__(self):
         return f"""<File(alias=${self.alias}, file_url = ${self.file_url}, server=${self.server})>"""
 
 
-class Bind(Base, BaseFile):
+class Bind(Base):
     __tablename__ = "binds"
+
+    id = Column(Integer, primary_key=True)
+    alias = Column(String(256), nullable=False)
+    file_url = Column(String(256), nullable=False)
+    server = Column(String(32), nullable=False)
+
+    __table_args__ = (UniqueConstraint(alias, server),)
 
     def __repr__(self):
         return f"""<Bind(alias=${self.alias}, file_url = ${self.file_url}, server=${self.server})>"""
