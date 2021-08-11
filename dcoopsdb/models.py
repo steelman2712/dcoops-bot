@@ -1,8 +1,8 @@
-from sqlalchemy.ext.declarative import declarative_base, declared_attr
+from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import Column, Integer, String, UniqueConstraint
 
 from dcoopsdb.db import session_scope
-
+import random
 
 
 class BaseFile(object):
@@ -13,28 +13,21 @@ class BaseFile(object):
     def load(cls, server, alias):
         alias = alias.lower()
         with session_scope() as session:
-            query = (
-                session.query(cls)
-                .filter_by(alias=alias)
-                .filter_by(server=server)
-            )
+            query = session.query(cls).filter_by(alias=alias).filter_by(server=server)
             db_file = query.all()
             session.close()
 
         return db_file
 
     @classmethod
-    def load_all(cls,server):
+    def load_all(cls, server):
         with session_scope() as session:
-            query = (
-                session.query(cls)
-                .filter_by(server=server)
-            )
+            query = session.query(cls).filter_by(server=server)
             entries = query.all()
             session.close()
 
-        return entries 
-        
+        return entries
+
     @classmethod
     def delete(cls, server, alias):
         alias = alias.lower()
@@ -73,7 +66,9 @@ class BaseFile(object):
             session.close()
         return randomRow
 
+
 Base = declarative_base(cls=BaseFile)
+
 
 class File(Base):
     __tablename__ = "files"

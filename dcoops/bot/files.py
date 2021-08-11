@@ -5,7 +5,6 @@ from dcoopsdb.db import session_scope
 
 audio_files = (".mp3", ".wav", ".ogg", ".webm", ".m4a")
 from sqlalchemy.orm.exc import NoResultFound
-import random
 
 
 def create_file(alias, url, server):
@@ -35,7 +34,7 @@ class Files(commands.Cog):
             url = ctx.message.attachments[0].url
             await self._upload_file(ctx, alias, url)
             await ctx.send(f"Created {alias}")
-        except Exception as e:
+        except Exception:
             await ctx.send(f"Could not create {alias}")
             raise
 
@@ -45,7 +44,7 @@ class Files(commands.Cog):
             print(f"Uploading new file with alias {alias}")
             await self._upload_file(ctx, alias, url)
             await ctx.send(f"Created {alias}")
-        except Exception as e:
+        except Exception:
             await ctx.send(f"Could not create {alias}")
             raise
 
@@ -53,7 +52,7 @@ class Files(commands.Cog):
     async def load(self, ctx, alias):
         try:
             server = ctx.guild.id
-            db_file = File.load(server=server,alias=alias)
+            db_file = File.load(server=server, alias=alias)
             print(f"Sending file with alias {alias}")
             await ctx.send(db_file.file_url)
         except NoResultFound:
@@ -85,7 +84,7 @@ class Files(commands.Cog):
         return exists
 
 
-class Binds():
+class Binds:
     async def upload_bind(self, ctx, url, alias):
         server = ctx.guild.id
         db_file = Bind(alias=alias, file_url=url, server=server)
