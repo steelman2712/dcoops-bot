@@ -29,7 +29,7 @@ from dcoops.bot.events import Events, play_bind, play_tts
 from threading import Thread
 import pika
 
-TEST_SERVER = 123456789
+TEST_SERVER = os.environ.get("TEST_SERVER")
 
 bot = commands.Bot(
     command_prefix=commands.when_mentioned_or("!"),
@@ -93,9 +93,7 @@ async def on_rabbitmq_message(text):
         print(guild)
         voice_client = discord.utils.get(bot.voice_clients, guild=guild)
         if text.startswith("groans"):
-            bind = text.split()[1]
-            if not bind:
-                bind = "groans"
+            bind = text.split()[1] if len(text.split()) > 1 else "groans"
             await play_bind(server=server_id, voice_client=voice_client, groan=bind)
         else:
             await play_tts(voice_client=voice_client, message=text)

@@ -1,7 +1,73 @@
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import Column, Integer, String, UniqueConstraint
 
-Base = declarative_base()
+from dcoopsdb.db import session_scope
+import random
+
+
+class BaseFile(object):
+
+    __abstract__ = True
+
+    @classmethod
+    def load(cls, server, alias):
+        alias = alias.lower()
+        with session_scope() as session:
+            query = session.query(cls).filter_by(alias=alias).filter_by(server=server)
+            db_file = query.all()
+            session.close()
+
+        return db_file
+
+    @classmethod
+    def load_all(cls, server):
+        with session_scope() as session:
+            query = session.query(cls).filter_by(server=server)
+            entries = query.all()
+            session.close()
+
+        return entries
+
+    @classmethod
+    def delete(cls, server, alias):
+        alias = alias.lower()
+        with session_scope() as session:
+            query = (  # noqa: F841
+                session.query(cls)
+                .filter_by(alias=alias)
+                .filter_by(server=server)
+                .delete()
+            )
+            session.commit()
+            session.close()
+
+    @classmethod
+    def exists(cls, server, alias):
+        alias = alias.lower()
+        with session_scope() as session:
+            exists = (
+                session.query(cls)
+                .filter_by(alias=alias)
+                .filter_by(server=server)
+                .scalar()
+            )
+            session.close()
+            if exists is not None:
+                return True
+            else:
+                return False
+
+    @classmethod
+    def random(cls, server):
+        with session_scope() as session:
+            query = session.query(cls).filter_by(server=server)
+            rowCount = int(query.count())
+            randomRow = query.offset(int(rowCount * random.random())).first()
+            session.close()
+        return randomRow
+
+
+Base = declarative_base(cls=BaseFile)
 
 
 class File(Base):

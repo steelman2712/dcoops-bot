@@ -12,6 +12,13 @@ from werkzeug.middleware.proxy_fix import ProxyFix
 
 # while True:
 #    time.sleep(10)
+import sys
+
+current_dir = os.path.dirname(__file__)
+root = os.path.sep.join(current_dir.split(os.path.sep)[:-2])
+sys.path.append(root)
+
+from dcoopsdb.models import Bind
 
 
 app = Flask(__name__)
@@ -75,7 +82,12 @@ def guilds():
 @dcoops.route("/soundboard")
 @requires_authorization
 def soundboard():
-    return "Test"
+    guilds = discord.fetch_guilds()
+    server = guilds[0]
+    print(server)
+    binds = Bind().load_all(server=server.id)
+    output = str([bind.alias for bind in binds])
+    return output
 
 
 @dcoops.route("/hello-world", methods=["GET"])
