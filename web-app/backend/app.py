@@ -13,12 +13,16 @@ from werkzeug.middleware.proxy_fix import ProxyFix
 # while True:
 #    time.sleep(10)
 from pathlib import Path
+import sys
+current_dir = os.path.dirname(__file__)
+print(current_dir)
+root = os.path.sep.join(current_dir.split(os.path.sep)[:-2])
+print(root)
+sys.path.append(root)
+port = os.environ.get("DB_PORT")
+print("Port: ",port)
 
-file = Path(__file__).resolve()
-parent, root = file.parent, file.parents[1]
-sys.path.append(str(root))
-
-from dcoopsdb.db import db
+from dcoopsdb.db import session_scope
 from dcoopsdb.models import File, Bind
 
 
@@ -79,11 +83,15 @@ def guilds():
         </body>
     </html>"""
 
-
 @dcoops.route("/soundboard")
 @requires_authorization
 def soundboard():
-    return "Test"
+    guilds = discord.fetch_guilds()
+    server = guilds[0]
+    print(server)
+    files = File().load_all(server=server.id)
+    output = str([discord_file.alias for discord_file in files])
+    return output
 
 
 @dcoops.route("/hello-world", methods=["GET"])

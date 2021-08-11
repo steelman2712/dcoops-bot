@@ -26,6 +26,7 @@ class Files(commands.Cog):
         db_file = create_file(alias, url, server)
         with session_scope() as session:
             session.add(db_file)
+            session.close()
 
     @commands.command()
     async def upload(self, ctx, alias):

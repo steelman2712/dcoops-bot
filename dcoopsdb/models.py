@@ -18,11 +18,23 @@ class BaseFile(object):
                 .filter_by(alias=alias)
                 .filter_by(server=server)
             )
-            db_file = query.one()
+            db_file = query.all()
             session.close()
 
         return db_file
 
+    @classmethod
+    def load_all(cls,server):
+        with session_scope() as session:
+            query = (
+                session.query(cls)
+                .filter_by(server=server)
+            )
+            entries = query.all()
+            session.close()
+
+        return entries 
+        
     @classmethod
     def delete(cls, server, alias):
         alias = alias.lower()

@@ -37,6 +37,9 @@ services:
       - type: volume
         source: d4e21b5cb2d3eee9ffffa2e040bd701c11108e32f1c1247fa24a28b8e6c667ea
         target: /var/lib/mysql
+      - type: bind
+        source: .data 
+        target: /home/data
 
   webapp:
     build:
@@ -49,7 +52,7 @@ services:
       - core-network
     volumes:
       - type: bind
-        source: ./web-app/backend
+        source: .
         target: /home/backenduser
     links:
       - 'mysql'
