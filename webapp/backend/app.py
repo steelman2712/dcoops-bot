@@ -19,7 +19,7 @@ root = os.path.sep.join(current_dir.split(os.path.sep)[:-2])
 sys.path.append(root)
 
 from dcoopsdb.models import Bind
-
+from webapp.backend.soundboard import Soundboard
 
 app = Flask(__name__)
 app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_host=1)
@@ -82,13 +82,20 @@ def guilds():
 @dcoops.route("/soundboard")
 @requires_authorization
 def soundboard():
-    guilds = discord.fetch_guilds()
-    server = guilds[0]
-    print(server)
-    binds = Bind().load_all(server=server.id)
-    output = str([bind.alias for bind in binds])
-    return output
+    guild = discord.fetch_guilds()[0]
+    server = os.environ.get("TEST_SERVER")
+    binds = Soundboard().load_bind_names(server)
+    return render_template("soundboard.html", binds=binds, server=server)
 
+#background process happening without any refreshing
+@dcoops.route("/play_sound", methods=["POST"])
+@requires_authorization
+def background_process_test():
+    bind = request.form["id"]
+    server = request.form["server"]
+    print(bind)
+    send_rabbit(f"groans {bind}")
+    return "Playing bind"
 
 @dcoops.route("/hello-world", methods=["GET"])
 def hello_world():

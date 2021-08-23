@@ -43,10 +43,10 @@ services:
 
   webapp:
     build:
-      context: ./web-app/backend
+      context: ./webapp/backend
       dockerfile: Dockerfile
     restart: on-failure
-    env_file: ./web-app/backend/.env
+    env_file: ./webapp/backend/.env
     networks:
       - dcoops-network
       - core-network

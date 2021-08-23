@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+<script type=text/javascript>
+        $(function() {
+            $("button").click(function(e) {
+                e.preventDefault();
+                $.ajax({
+                    type: "POST",
+                    url: "/dcoops/play_sound",
+                    data: { 
+                        id: $(this).val(), // < note use of 'this' here
+                        server: {{ server }}
+                    },
+                    success: function(result) {
+                        alert('Playing bind');
+                    },
+                    error: function(result) {
+                        alert('error');
+                    }
+                });
+            });
+        });
+</script>
+    
+
+
+<head>
+    <title>Soundboard</title>
+</head>
+
+<body>
+    <ul id="soundboard-main-panel">
+    {% for bind in binds %}
+        <button value="{{ bind }}" name="but-{{ bind }}">{{ bind }}</button>
+    {% endfor %}
+    </ul>
+</body>
