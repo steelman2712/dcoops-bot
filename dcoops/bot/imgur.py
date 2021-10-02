@@ -27,6 +27,7 @@ async def wait_until_processed(upload_id, client_id):
             headers={"Authorization": f"Client-ID {client_id}"},
         )
         processing_response = json.loads(processing_response.content)
+
         success = processing_response.get("success")
         if not success:
             break
@@ -39,11 +40,11 @@ async def wait_until_processed(upload_id, client_id):
 
 
 async def upload_video(video_file):
-    with open("./test2.mp4", "rb") as video:
-        data = {"video": video.read(), "type": "file", "disable_audio": 1}
+    with open(video_file, "rb") as video:
+        data = {"type": "file", "disable_audio": 1}
         response = requests.post(
             url=url,
-            files={"video": open(video_file, "rb")},
+            files={"video": video},
             headers={"Authorization": f"Client-ID {client_id}"},
             data=data,
         )

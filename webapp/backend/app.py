@@ -3,9 +3,10 @@ import os
 import time
 import pika
 import asyncio
-from flask_discord import DiscordOAuth2Session, requires_authorization
+from flask_discord import DiscordOAuth2Session, requires_authorization, Unauthorized
 import logging
 from werkzeug.middleware.proxy_fix import ProxyFix
+import json
 
 # import os
 # from steelforge_site_utils.aws_verify import verify_jwt, authed, get_user_type, verify_access_token
@@ -18,13 +19,18 @@ current_dir = os.path.dirname(__file__)
 root = os.path.sep.join(current_dir.split(os.path.sep)[:-2])
 sys.path.append(root)
 
-from dcoopsdb.models import Bind
+# from dcoopsdb.models import Bind
+from webapp.backend.soundboard import Soundboard
 
 
 app = Flask(__name__)
+from webapp.backend.src.api import dcoops_api
+
 app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_host=1)
 # app.secret_key = SECRET_KEY
 dcoops = Blueprint("dcoops", __name__)
+# app.register_blueprint(dcoops, url_prefix="/dcoops")
+app.register_blueprint(dcoops_api)
 app.config["SECRET_KEY"] = os.environ.get("FLASK_SECRET_KEY")
 app.config["DISCORD_CLIENT_ID"] = os.getenv("DISCORD_CLIENT_ID")
 app.config["DISCORD_CLIENT_SECRET"] = os.getenv("DISCORD_CLIENT_SECRET")
@@ -40,6 +46,11 @@ print("Started")
 @dcoops.route("/login")
 def login():
     return discord.create_session()
+
+
+@app.errorhandler(Unauthorized)
+def redirect_unauthorized(e):
+    return redirect(url_for("dcoops.login"))
 
 
 @dcoops.route("/login-redirect")
@@ -63,31 +74,37 @@ def me():
     </html>"""
 
 
-@dcoops.route("/guilds/")
+@dcoops.route("/guilds")
 @requires_authorization
 def guilds():
     guilds = discord.fetch_guilds()
-    return f"""
-    <html>
-        <head>
-            <title>Servers</title>
-        </head>
-        <body>
-            {guilds[0].name}
-            <img src='{guilds[0].icon_url}' />
-        </body>
-    </html>"""
+    guild_json = [guild_to_json(guild) for guild in guilds]
+    return json.dumps(guild_json)
+
+
+def guild_to_json(guild):
+    guild_info = {"id": guild.id, "name": guild.name, "icon": guild.icon_url}
+    return guild_info
 
 
 @dcoops.route("/soundboard")
 @requires_authorization
 def soundboard():
-    guilds = discord.fetch_guilds()
-    server = guilds[0]
-    print(server)
-    binds = Bind().load_all(server=server.id)
-    output = str([bind.alias for bind in binds])
-    return output
+    # guild = discord.fetch_guilds()[0]
+    server = os.environ.get("TEST_SERVER")
+    binds = Soundboard().load_bind_names(server)
+    return render_template("soundboard.html", binds=binds, server=server)
+
+
+# background process happening without any refreshing
+@dcoops.route("/play_sound", methods=["POST"])
+@requires_authorization
+def background_process_test():
+    bind = request.form["id"]
+    # server = request.form["server"]
+    print(bind)
+    send_rabbit(f"groans {bind}")
+    return "Playing bind"
 
 
 @dcoops.route("/hello-world", methods=["GET"])
@@ -97,6 +114,7 @@ def hello_world():
 
 @dcoops.route("/ping", methods=["GET"])
 def ping():
+    print(app.url_map)
     t = time.localtime()
     current_time = time.strftime("%H:%M:%S", t)
     return f"ping - {current_time}"

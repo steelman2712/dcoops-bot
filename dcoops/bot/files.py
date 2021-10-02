@@ -25,6 +25,7 @@ class Files(commands.Cog):
         db_file = create_file(alias, url, server)
         with session_scope() as session:
             session.add(db_file)
+            session.commit()
             session.close()
 
     @commands.command()
@@ -88,7 +89,10 @@ class Binds:
     async def upload_bind(self, ctx, url, alias):
         server = ctx.guild.id
         db_file = Bind(alias=alias, file_url=url, server=server)
-        db_file.upload()
+        with session_scope() as session:
+            session.add(db_file)
+            session.commit()
+            session.close()
 
     async def load_bind(self, ctx, alias):
         server = ctx.guild.id

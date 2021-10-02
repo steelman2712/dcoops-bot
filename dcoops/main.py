@@ -30,6 +30,7 @@ from threading import Thread
 import pika
 
 TEST_SERVER = os.environ.get("TEST_SERVER")
+print("TEST SERVER: ", TEST_SERVER)
 
 bot = commands.Bot(
     command_prefix=commands.when_mentioned_or("!"),
@@ -88,7 +89,8 @@ async def rabbit_tts():
 
 async def on_rabbitmq_message(text):
     try:
-        server_id = TEST_SERVER
+        server_id = int(TEST_SERVER)
+        print(server_id)
         guild = bot.get_guild(server_id)
         print(guild)
         voice_client = discord.utils.get(bot.voice_clients, guild=guild)

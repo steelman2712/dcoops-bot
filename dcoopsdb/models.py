@@ -14,7 +14,7 @@ class BaseFile(object):
         alias = alias.lower()
         with session_scope() as session:
             query = session.query(cls).filter_by(alias=alias).filter_by(server=server)
-            db_file = query.all()
+            db_file = query.one()
             session.close()
 
         return db_file

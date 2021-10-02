@@ -43,10 +43,10 @@ services:
 
   webapp:
     build:
-      context: ./web-app/backend
+      context: ./webapp/backend
       dockerfile: Dockerfile
     restart: on-failure
-    env_file: ./web-app/backend/.env
+    env_file: ./webapp/backend/.env
     networks:
       - dcoops-network
       - core-network
@@ -61,6 +61,18 @@ services:
       - mysql
       - rabbitMQ
   
+  frontend:
+    build:
+      context: ./webapp/frontend
+      dockerfile: Dockerfile
+    restart: on-failure
+    env_file: ./webapp/frontend/.env
+    networks:
+      - dcoops-network
+      - core-network
+    ports: 
+      - '3000:3000'
+
   rabbitMQ:
     image: rabbitmq:3.9-management
     restart: always
