@@ -71,12 +71,13 @@ class Events(commands.Cog):
 
     @commands.Cog.listener()
     async def on_message_edit(self, before, after):
-        print("Edited")
+        # print("Edited")
         self.bot.dispatch("my_event")
 
     @commands.Cog.listener()
     async def on_my_event(self):
-        print("Test")
+        # print("Test")
+        return
 
     async def has_joined(self, before, after):
         if before.channel is None:

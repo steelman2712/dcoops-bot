@@ -27,7 +27,7 @@ async def wait_until_processed(upload_id, client_id):
             headers={"Authorization": f"Client-ID {client_id}"},
         )
         processing_response = json.loads(processing_response.content)
-        
+
         success = processing_response.get("success")
         if not success:
             break

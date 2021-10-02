@@ -6,7 +6,7 @@ import asyncio
 from flask_discord import DiscordOAuth2Session, requires_authorization, Unauthorized
 import logging
 from werkzeug.middleware.proxy_fix import ProxyFix
-import json 
+import json
 
 # import os
 # from steelforge_site_utils.aws_verify import verify_jwt, authed, get_user_type, verify_access_token
@@ -25,10 +25,11 @@ from webapp.backend.soundboard import Soundboard
 
 app = Flask(__name__)
 from webapp.backend.src.api import dcoops_api
+
 app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_host=1)
 # app.secret_key = SECRET_KEY
 dcoops = Blueprint("dcoops", __name__)
-#app.register_blueprint(dcoops, url_prefix="/dcoops")
+# app.register_blueprint(dcoops, url_prefix="/dcoops")
 app.register_blueprint(dcoops_api)
 app.config["SECRET_KEY"] = os.environ.get("FLASK_SECRET_KEY")
 app.config["DISCORD_CLIENT_ID"] = os.getenv("DISCORD_CLIENT_ID")
@@ -50,6 +51,7 @@ def login():
 @app.errorhandler(Unauthorized)
 def redirect_unauthorized(e):
     return redirect(url_for("dcoops.login"))
+
 
 @dcoops.route("/login-redirect")
 def callback():
@@ -79,13 +81,11 @@ def guilds():
     guild_json = [guild_to_json(guild) for guild in guilds]
     return json.dumps(guild_json)
 
+
 def guild_to_json(guild):
-    guild_info = {
-        "id": guild.id,
-        "name": guild.name,
-        "icon": guild.icon_url
-    }
+    guild_info = {"id": guild.id, "name": guild.name, "icon": guild.icon_url}
     return guild_info
+
 
 @dcoops.route("/soundboard")
 @requires_authorization
