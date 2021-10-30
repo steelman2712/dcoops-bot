@@ -2,20 +2,26 @@ import discord
 from discord.ext import commands
 from dcoops.bot.music import audio_source_from_query
 from dcoops.bot.tts import tts_to_file
-
+from discord.errors import ClientException
 
 async def play_bind(server, voice_client, groan="groans"):
     source = await audio_source_from_query(server=server, query=groan)
-    voice_client.play(
-        source, after=lambda e: print("Player error: %s" % e) if e else None
-    )
+    try:
+        voice_client.play(
+            source, after=lambda e: print("Player error: %s" % e) if e else None
+        )
+    except ClientException:
+        pass
 
 
 async def play_file(voice_client, filename):
     source = discord.PCMVolumeTransformer(discord.FFmpegPCMAudio(filename))
-    voice_client.play(
-        source, after=lambda e: print("Player error: %s" % e) if e else None
-    )
+    try:
+        voice_client.play(
+            source, after=lambda e: print("Player error: %s" % e) if e else None
+        )
+    except ClientException:
+        pass
 
 
 async def play_tts(voice_client, message):
