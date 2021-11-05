@@ -42,7 +42,6 @@ target_metadata = models.Base.metadata
 # my_important_option = config.get_main_option("my_important_option")
 # ... etc.
 
-print(db.sqlalchemy_url)
 
 def run_migrations_offline():
     """Run migrations in 'offline' mode.

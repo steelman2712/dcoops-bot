@@ -136,7 +136,7 @@ def tts():
         text = request.form["text"]
         processed_text = text.upper()
         send_rabbit(text)
-        return processed_text
+        return f"Sent tts of {text}"
 
 
 def connection():
