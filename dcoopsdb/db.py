@@ -11,4 +11,3 @@ port = os.environ.get("DB_PORT")
 sqlalchemy_url = f"mysql+pymysql://{user}:{password}@{host}:{port}/discord"
 engine = create_engine(sqlalchemy_url, echo=False)
 Session = sessionmaker(engine)
-

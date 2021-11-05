@@ -159,3 +159,6 @@ dmypy.json
 /webapp/frontend/npm-debug.log*
 /webapp/frontend/yarn-debug.log*
 /webapp/frontend/yarn-error.log*
+backup.tar
+.data/mysqldump
+core

@@ -134,7 +134,6 @@ def tts():
         return render_template("basic_form.html")
     else:
         text = request.form["text"]
-        processed_text = text.upper()
         send_rabbit(text)
         return f"Sent tts of {text}"
 

@@ -4,6 +4,7 @@ from dcoops.bot.music import audio_source_from_query
 from dcoops.bot.tts import tts_to_file
 from discord.errors import ClientException
 
+
 async def play_bind(server, voice_client, groan="groans"):
     source = await audio_source_from_query(server=server, query=groan)
     try:
