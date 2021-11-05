@@ -1,7 +1,7 @@
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import Column, Integer, String, UniqueConstraint
 
-from dcoopsdb.db import session_scope
+from dcoopsdb.db import Session
 import random
 
 
@@ -12,7 +12,7 @@ class BaseFile(object):
     @classmethod
     def load(cls, server, alias):
         alias = alias.lower()
-        with session_scope() as session:
+        with Session() as session:
             query = session.query(cls).filter_by(alias=alias).filter_by(server=server)
             db_file = query.one()
             session.close()
@@ -21,7 +21,7 @@ class BaseFile(object):
 
     @classmethod
     def load_all(cls, server):
-        with session_scope() as session:
+        with Session() as session:
             query = session.query(cls).filter_by(server=server)
             entries = query.all()
             session.close()
@@ -31,7 +31,7 @@ class BaseFile(object):
     @classmethod
     def delete(cls, server, alias):
         alias = alias.lower()
-        with session_scope() as session:
+        with Session() as session:
             query = (  # noqa: F841
                 session.query(cls)
                 .filter_by(alias=alias)
@@ -44,7 +44,7 @@ class BaseFile(object):
     @classmethod
     def exists(cls, server, alias):
         alias = alias.lower()
-        with session_scope() as session:
+        with Session() as session:
             exists = (
                 session.query(cls)
                 .filter_by(alias=alias)
@@ -59,7 +59,7 @@ class BaseFile(object):
 
     @classmethod
     def random(cls, server):
-        with session_scope() as session:
+        with Session() as session:
             query = session.query(cls).filter_by(server=server)
             rowCount = int(query.count())
             randomRow = query.offset(int(rowCount * random.random())).first()

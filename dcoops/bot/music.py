@@ -7,7 +7,7 @@ import youtube_dl
 from discord.ext import commands
 
 from dcoopsdb.models import Bind
-from dcoopsdb.db import session_scope
+from dcoopsdb.db import Session
 
 from dcoops.bot.files import Binds
 
@@ -48,7 +48,7 @@ ytdl_video = youtube_dl.YoutubeDL(ytdl_video_options)
 
 
 async def audio_source_from_query(query, server):
-    with session_scope() as session:
+    with Session() as session:
         query = query.lower()
         try:
             db_query = (

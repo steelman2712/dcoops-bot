@@ -1,7 +1,7 @@
 from discord.ext import commands
 
 from dcoopsdb.models import File, Bind
-from dcoopsdb.db import session_scope
+from dcoopsdb.db import Session
 
 audio_files = (".mp3", ".wav", ".ogg", ".webm", ".m4a")
 from sqlalchemy.orm.exc import NoResultFound
@@ -23,7 +23,7 @@ class Files(commands.Cog):
     async def _upload_file(self, ctx, alias, url):
         server = ctx.guild.id
         db_file = create_file(alias, url, server)
-        with session_scope() as session:
+        with Session() as session:
             session.add(db_file)
             session.commit()
             session.close()
@@ -88,8 +88,10 @@ class Files(commands.Cog):
 class Binds:
     async def upload_bind(self, ctx, url, alias):
         server = ctx.guild.id
+        print("Bind url = ", url)
         db_file = Bind(alias=alias, file_url=url, server=server)
-        with session_scope() as session:
+        print("Bind object: ", db_file)
+        with Session() as session:
             session.add(db_file)
             session.commit()
             session.close()

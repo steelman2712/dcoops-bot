@@ -1,11 +1,11 @@
 from discord.ext import commands
 
 from dcoopsdb.models import File, Bind
-from dcoopsdb.db import session_scope
+from dcoopsdb.db import Session
 
 
 def list_items(item_class, server):
-    with session_scope() as session:
+    with Session() as session:
         try:
             db_query = session.query(item_class).filter_by(server=server)
             files = db_query.all()
@@ -45,7 +45,7 @@ class Utilities(commands.Cog):
     @commands.command()
     async def list_groans(self, ctx):
         server = ctx.guild.id
-        with session_scope() as session:
+        with Session() as session:
             for files, binds in (
                 session.query(File, Bind)
                 .join(File.alias == Bind.alias)
