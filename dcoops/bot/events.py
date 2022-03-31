@@ -3,7 +3,8 @@ from discord.ext import commands
 from dcoops.bot.music import audio_source_from_query
 from dcoops.bot.tts import tts_to_file
 from discord.errors import ClientException
-
+import functools
+from dcoops.bot.custom_messages import join_message, leave_message
 
 async def play_bind(server, voice_client, groan="groans"):
     source = await audio_source_from_query(server=server, query=groan)
@@ -14,7 +15,6 @@ async def play_bind(server, voice_client, groan="groans"):
     except ClientException:
         pass
 
-
 async def play_file(voice_client, filename):
     source = discord.PCMVolumeTransformer(discord.FFmpegPCMAudio(filename))
     try:
@@ -24,19 +24,24 @@ async def play_file(voice_client, filename):
     except ClientException:
         pass
 
-
 async def play_tts(voice_client, message):
     await tts_to_file(message)
     await play_file(voice_client=voice_client, filename="tts.mp3")
 
 
 class Events(commands.Cog):
+
+    # A list of users we don't want to activate the join or leave message
+    excluded_users = [618229141782790144, 783708073390112830]
+
     def __init__(self, bot):
         self.bot = bot
         self._last_member = None
 
     @commands.Cog.listener()
     async def on_voice_state_update(self, member, before, after):
+        if member.id in self.excluded_users:
+            return
         channel = after.channel
         if channel is None:
             channel = before.channel
@@ -50,11 +55,9 @@ class Events(commands.Cog):
             else:
                 name = member.name
             if await self.has_joined(before, after):
-                tts_message = f"{name} has joined the voice channel"
-                await play_tts(voice_client=voice_client, message=tts_message)
+                await join_message(voice_client=voice_client, member=member)
             elif await self.has_left(before, after):
-                tts_message = f"{name} has left the bloody bastard voice channel"
-                await play_tts(voice_client=voice_client, message=tts_message)
+                await leave_message(voice_client=voice_client, member=member)
             # elif await self.has_muted_mic(before,after) or await self.has_unmuted_mic(before,after):
             # await play_bind(server=member.guild.id,voice_client=voice_client,groan="groans")
             else:

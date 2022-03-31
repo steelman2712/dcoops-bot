@@ -100,8 +100,7 @@ class YTDLSource(discord.PCMVolumeTransformer):
         if "entries" in data:
             # take first item from a playlist
             data = data["entries"][0]
-
-        filename = data["url"] if stream else ytdl.prepare_filename(data)
+        filename = data["formats"][0]["url"] if stream else ytdl.prepare_filename(data)
         return cls(discord.FFmpegPCMAudio(filename, **ffmpeg_options), data=data)
 
     @classmethod
@@ -179,6 +178,8 @@ class Music(commands.Cog):
     @commands.command()
     async def play(self, ctx, *, query):
         """Plays a file from the local filesystem"""
+        if query.startswith("http"):
+            await ctx.invoke(self.bot.get_command("yt"), url=query)
         server = ctx.guild.id
         source = await audio_source_from_query(query=query, server=server)
         ctx.voice_client.play(
@@ -192,7 +193,7 @@ class Music(commands.Cog):
         """Plays from a url (almost anything youtube_dl supports)"""
 
         async with ctx.typing():
-            player = await YTDLSource.from_url(url, loop=self.bot.loop)
+            player = await YTDLSource.from_url(url, loop=self.bot.loop, stream=True)
             ctx.voice_client.play(
                 player, after=lambda e: print("Player error: %s" % e) if e else None
             )
@@ -250,6 +251,7 @@ class Music(commands.Cog):
     @commands.command()
     async def groans(self, ctx, alias="groans"):
         """Plays a bind and loads an image at the same time"""
+        print(ctx.voice_client)
         if alias == "random":
             random_bind = await Binds().random(ctx)
             alias = random_bind.alias

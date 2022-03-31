@@ -3,6 +3,7 @@ from dotenv import load_dotenv
 from discord.ext import commands
 from pretty_help import PrettyHelp
 import discord
+import time
 
 from pathlib import Path
 import sys
@@ -26,9 +27,11 @@ from dcoops.bot.activity import Resident
 from dcoops.bot.groans import Groans
 from dcoops.bot.jigsaw import Jigsaw
 from dcoops.bot.events import Events, play_bind, play_tts
+from dcoops.bot.custom_messages import Messages
 from threading import Thread
 import pika
 
+WEB_APP_ACTIVE = os.environ.get("WEB_APP_ACTIVE") or False
 TEST_SERVER = os.environ.get("TEST_SERVER")
 print("TEST SERVER: ", TEST_SERVER)
 
@@ -47,6 +50,7 @@ async def on_ready():
 
 
 token = os.environ.get("DISCORD_TOKEN")
+print(token)
 bot.add_cog(Music(bot))
 bot.add_cog(Files(bot))
 bot.add_cog(Utilities(bot))
@@ -54,6 +58,7 @@ bot.add_cog(Resident(bot))
 bot.add_cog(Groans(bot))
 bot.add_cog(Jigsaw(bot))
 bot.add_cog(Events(bot))
+bot.add_cog(Messages(bot))
 
 
 def get_connection():
@@ -133,8 +138,7 @@ def send_rabbit():
 def run_bot(bot, token):
     bot.run(token)
 
-
-if __name__ == "__main__":
+def start_with_webapp():
     rabbitMQ_connected = False
     while not rabbitMQ_connected:
         try:
@@ -145,7 +149,15 @@ if __name__ == "__main__":
             rabbitMQ_connected = True
             connection.close()
         except Exception:
+            print("Unable to connect to RabbitMQ")
+            time.sleep(1)
             pass
     threadC = Thread(target=start_consumers)
     threadC.start()
     bot.run(token)
+
+if __name__ == "__main__":
+    if WEB_APP_ACTIVE:
+        start_with_webapp()
+    else:
+        bot.run(token)
