@@ -1,8 +1,5 @@
 import discord
 from discord.ext import commands
-from discord.errors import ClientException
-from sqlalchemy import exists
-
 from dcoops.bot.tts import tts_to_file
 from dcoopsdb.models import CustomMessage
 from dcoopsdb.db import Session

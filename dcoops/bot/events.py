@@ -3,7 +3,6 @@ from discord.ext import commands
 from dcoops.bot.music import audio_source_from_query
 from dcoops.bot.tts import tts_to_file
 from discord.errors import ClientException
-import functools
 from dcoops.bot.custom_messages import join_message, leave_message
 
 
@@ -53,10 +52,6 @@ class Events(commands.Cog):
         else:
             await self.ensure_voice(channel)
             voice_client = member.guild.voice_client
-            if member.nick:
-                name = member.nick
-            else:
-                name = member.name
             if await self.has_joined(before, after):
                 await join_message(voice_client=voice_client, member=member)
             elif await self.has_left(before, after):
