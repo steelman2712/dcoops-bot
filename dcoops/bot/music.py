@@ -2,7 +2,7 @@ import asyncio
 import os
 
 import discord
-import youtube_dl
+import yt_dlp
 
 from discord.ext import commands
 
@@ -20,7 +20,7 @@ root_dir = os.path.dirname(os.path.dirname(__file__))
 cache_directory = os.path.join(root_dir, CACHE_LOCATION)
 print(cache_directory)
 
-youtube_dl.utils.bug_reports_message = lambda: ""
+yt_dlp.utils.bug_reports_message = lambda: ""
 
 ytdl_format_options = {
     "format": "bestaudio/best",
@@ -43,8 +43,8 @@ ytdl_video_options[
     "format"
 ] = "bestvideo[height<=480,ext=mp4]+bestaudio[ext=m4a]/best[height<=480,ext=mp4]/best[ext=mp4]/best"
 
-ytdl = youtube_dl.YoutubeDL(ytdl_format_options)
-ytdl_video = youtube_dl.YoutubeDL(ytdl_video_options)
+ytdl = yt_dlp.YoutubeDL(ytdl_format_options)
+ytdl_video = yt_dlp.YoutubeDL(ytdl_video_options)
 
 
 async def audio_source_from_query(query, server):
@@ -190,7 +190,7 @@ class Music(commands.Cog):
 
     @commands.command()
     async def yt(self, ctx, *, url):
-        """Plays from a url (almost anything youtube_dl supports)"""
+        """Plays from a url (almost anything yt_dlp supports)"""
 
         async with ctx.typing():
             player = await YTDLSource.from_url(url, loop=self.bot.loop, stream=True)
