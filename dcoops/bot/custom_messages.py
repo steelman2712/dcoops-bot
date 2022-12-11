@@ -17,12 +17,9 @@ async def default_message(name, message_type):
 
 async def play_file(voice_client, filename):
     source = discord.PCMVolumeTransformer(discord.FFmpegPCMAudio(filename))
-    try:
-        voice_client.play(
-            source, after=lambda e: print("Player error: %s" % e) if e else None
-        )
-    except ClientException:
-        pass
+    voice_client.play(
+        source, after=lambda e: print("Player error: %s" % e) if e else None
+    )
 
 async def play_tts(voice_client, message):
     await tts_to_file(message)
