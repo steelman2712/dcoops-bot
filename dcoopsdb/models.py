@@ -97,7 +97,9 @@ class Bind(FileBase):
     def __repr__(self):
         return f"""<Bind(alias=${self.alias}, file_url = ${self.file_url}, server=${self.server})>"""
 
+
 Base = declarative_base()
+
 
 class CustomMessage(Base):
     __tablename__ = "custom_messages"
@@ -106,13 +108,18 @@ class CustomMessage(Base):
 
     id = Column(Integer, primary_key=True)
     server = Column(String(32), nullable=False)
-    user_id =  Column(String(32))
+    user_id = Column(String(32))
     message_type = Column(Text, nullable=False)
     message = Column(Text)
 
     def load_message(self, server, user_id, message_type):
         with Session() as session:
-            query = session.query(CustomMessage).filter_by(user_id=user_id).filter_by(server=server).filter_by(message_type=message_type)
+            query = (
+                session.query(CustomMessage)
+                .filter_by(user_id=user_id)
+                .filter_by(server=server)
+                .filter_by(message_type=message_type)
+            )
             message = query.first()
             session.close()
         return message
