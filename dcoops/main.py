@@ -138,6 +138,7 @@ def send_rabbit():
 def run_bot(bot, token):
     bot.run(token)
 
+
 def start_with_webapp():
     rabbitMQ_connected = False
     while not rabbitMQ_connected:
@@ -155,6 +156,7 @@ def start_with_webapp():
     threadC = Thread(target=start_consumers)
     threadC.start()
     bot.run(token)
+
 
 if __name__ == "__main__":
     if WEB_APP_ACTIVE:

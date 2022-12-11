@@ -6,6 +6,7 @@ from discord.errors import ClientException
 import functools
 from dcoops.bot.custom_messages import join_message, leave_message
 
+
 async def play_bind(server, voice_client, groan="groans"):
     source = await audio_source_from_query(server=server, query=groan)
     try:
@@ -15,6 +16,7 @@ async def play_bind(server, voice_client, groan="groans"):
     except ClientException:
         pass
 
+
 async def play_file(voice_client, filename):
     source = discord.PCMVolumeTransformer(discord.FFmpegPCMAudio(filename))
     try:
@@ -23,6 +25,7 @@ async def play_file(voice_client, filename):
         )
     except ClientException:
         pass
+
 
 async def play_tts(voice_client, message):
     await tts_to_file(message)
