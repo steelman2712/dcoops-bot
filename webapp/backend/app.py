@@ -22,7 +22,6 @@ sys.path.append(root)
 # from dcoopsdb.models import Bind
 from webapp.backend.soundboard import Soundboard
 
-
 app = Flask(__name__)
 from webapp.backend.src.api import dcoops_api
 

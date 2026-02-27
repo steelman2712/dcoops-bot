@@ -39,9 +39,9 @@ ytdl_format_options = {
 ffmpeg_options = {"options": "-vn"}
 
 ytdl_video_options = ytdl_format_options
-ytdl_video_options[
-    "format"
-] = "bestvideo[height<=480]+bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best[ext=mp4]/best"
+ytdl_video_options["format"] = (
+    "bestvideo[height<=480]+bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best[ext=mp4]/best"
+)
 
 ytdl = yt_dlp.YoutubeDL(ytdl_format_options)
 ytdl_video = yt_dlp.YoutubeDL(ytdl_video_options)
