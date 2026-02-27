@@ -2,7 +2,6 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, scoped_session
 import os
 
-
 user = os.environ.get("DB_USERNAME")
 password = os.environ.get("DB_PASSWORD")
 host = os.environ.get("DB_HOST")
