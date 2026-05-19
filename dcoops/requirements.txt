@@ -6,7 +6,7 @@ cffi==1.14.4
 chardet==3.0.4
 cryptography==39.0.1
 discord.py[voice]==1.7.3
-idna==2.10
+idna==3.15
 Mako==1.2.2
 MarkupSafe==1.1.1
 multidict==4.7.6
